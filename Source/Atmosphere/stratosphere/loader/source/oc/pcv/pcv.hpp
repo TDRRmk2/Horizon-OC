@@ -193,6 +193,8 @@ namespace ams::ldr::oc::pcv
 
         constexpr int gpuVmin = 810;
 
+        constexpr int gpuVmax = 1100;
+
         constexpr u32 CpuVoltOfficial = 1235;
 
         constexpr u32 CpuVoltL4T = 1235'000;

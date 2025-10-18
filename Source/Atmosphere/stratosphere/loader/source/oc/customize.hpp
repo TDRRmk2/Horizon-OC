@@ -84,6 +84,7 @@
      u32 eristaGpuVmin;
      u32 marikoGpuVmin;
      u32 marikoGpuVmax;
+     u32 eristaGpuVmax;
 
      u32 marikoGpuVoltArray[24];
      u32 eristaGpuVoltArray[14];

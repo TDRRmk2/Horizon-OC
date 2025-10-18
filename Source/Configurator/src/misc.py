@@ -197,7 +197,7 @@ def set_white_tiger_clocks(app_data):
     vddq_mv_label = ["Default (600 mV)" if f == 0 else f"{f} mV" for f in vddq_mv]
     dpg.configure_item("marikoEmcVddqVolt", items=vddq_mv_label)
 
-    base_voltages_uv = list(range(1050000, 1212500 + 1, 12500))
+    base_voltages_uv = list(range(912500, 1212500 + 1, 12500))
     voltages_uv = base_voltages_uv + list(range(1225000, 1400000 + 1, 12500)) if app_data else base_voltages_uv
     voltages_mv = [v / 1000 for v in voltages_uv]
     voltages_mv_label = ["Default (1175 mV)" if f == 0 else f"{f} mV" for f in voltages_mv]

@@ -179,6 +179,7 @@ void SafetyCheck() {
         { marikoCpuDvfsMaxFreq,  1785'000, 3000'000 },
         { eristaGpuDvfsMaxFreq,   768'000, 1228'000 },
         { marikoGpuDvfsMaxFreq,   768'000, 1536'000 },
+        
     };
 
     for (auto& i : validators) {

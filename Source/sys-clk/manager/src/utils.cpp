@@ -115,7 +115,7 @@ brls::SelectListItem* createFreqListItem(SysClkModule module, uint32_t selectedF
             name = "Memory Frequency";
             break;
         default:
-            return "Invalid HocClkModule!";
+            return 0;
     }
 
     uint32_t* table = &g_freq_table_hz[module][0];

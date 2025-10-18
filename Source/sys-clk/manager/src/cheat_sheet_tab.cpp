@@ -29,9 +29,9 @@ CheatSheetTab::CheatSheetTab()
     this->addView(new brls::Header("CPU Clocks"));
     brls::Table *cpuTable = new brls::Table();
 
-    gpuTable->addRow(brls::TableRowType::BODY, "Mariko Absolute Max", "2601 MHz");
+    cpuTable->addRow(brls::TableRowType::BODY, "Mariko Absolute Max", "2601 MHz");
 
-    gpuTable->addRow(brls::TableRowType::BODY, "Erista Absolute Max", "2295 MHz");
+    cpuTable->addRow(brls::TableRowType::BODY, "Erista Absolute Max", "2295 MHz");
 
 
     cpuTable->addRow(brls::TableRowType::BODY, "Maximum (Mariko Safe)", "1963 MHz");
@@ -59,7 +59,7 @@ CheatSheetTab::CheatSheetTab()
     gpuTable->addRow(brls::TableRowType::BODY, "Maximum Mariko Handheld", "614 MHz");
     gpuTable->addRow(brls::TableRowType::BODY, "Maximum Erista Handheld", "460 MHz");
     gpuTable->addRow(brls::TableRowType::BODY, "Official Handheld", "307-460 MHz (depends per game)");
-l
+
     gpuTable->addRow(brls::TableRowType::BODY, "Boost Mode", "76 MHz");
 
     this->addView(gpuTable);
@@ -68,9 +68,9 @@ l
     this->addView(new brls::Header("MEM Clocks"));
     brls::Table *memTable = new brls::Table();
 
-    gpuTable->addRow(brls::TableRowType::BODY, "Mariko Absolute Max", "3200 MHz");
+    memTable->addRow(brls::TableRowType::BODY, "Mariko Absolute Max", "3200 MHz");
 
-    gpuTable->addRow(brls::TableRowType::BODY, "Erista Absolute Max", "2360 MHz");
+    memTable->addRow(brls::TableRowType::BODY, "Erista Absolute Max", "2360 MHz");
 
     memTable->addRow(brls::TableRowType::BODY, "Mariko Official Max", "2133 MHz");
     memTable->addRow(brls::TableRowType::BODY, "AM-MGCJ / Hynix NME Official Max", "1862 MHz");

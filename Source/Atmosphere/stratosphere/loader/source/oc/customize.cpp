@@ -85,6 +85,9 @@ volatile CustomizeTable C = {
 .marikoGpuVmin = 610,
 
 .marikoGpuVmax = 800,
+
+.eristaGpuVmax = 1050, // Erista voltage table is insane.
+
 // NOTE: These tables should NOT BE USED and are only here as placeholders. Always try and find your own optimal tables.
 // Ensure the voltages actually increase or stay the sameot
 

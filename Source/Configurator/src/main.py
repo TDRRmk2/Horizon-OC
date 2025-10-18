@@ -40,14 +40,15 @@ from defaults import d
 import installer as ins
 import about
 import misc
+import settings as s
 
 true = True
 false = False
 
-# if getattr(sys, 'frozen', False):
-assets_path = os.path.join(sys._MEIPASS, 'assets/')
-# else:
-    # assets_path = os.path.join(os.path.dirname(__file__), '../assets/')
+if getattr(sys, 'frozen', False):
+    assets_path = os.path.join(sys._MEIPASS, 'assets/')
+else:
+    assets_path = os.path.join(os.path.dirname(__file__), '../assets/')
 
 cooler_image_path = assets_path + "coolerhd.png" # coolerHD Emoji from OC server
 cooler_image = Image.open(cooler_image_path).convert("RGBA")
@@ -117,7 +118,7 @@ with dpg.window(label="Configurator", width=400, height=300,id="main_window"):
             dpg.add_button(label="Save settings", callback=k.write_kip)
             dpg.add_separator(label="Downloads")
             dpg.add_button(label="Install Horizon OC Loader", callback=ins.downloadLoader)
-            dpg.add_button(label="Install Horizon OC Clock Manager", callback=lambda: ins.download_and_extract_zip(c, ins.hoc_clk_download_link, zip_filename="hoc_clk_temp.zip", success_message="Installed hoc-clk!"))
+            dpg.add_button(label="Install Horizon OC Clock Manager", callback=lambda: ins.download_and_extract_zip(c, s.hoc_clk_download_link, zip_filename="hoc_clk_temp.zip", success_message="Installed hoc-clk!"))
             dpg.add_separator(label="Advanced")
             dpg.add_button(label="Manually Select hoc.kip", callback=lambda: dpg.show_item("file_dialog"))
         with dpg.tab(label="GPU", tag="gpu_tab"):

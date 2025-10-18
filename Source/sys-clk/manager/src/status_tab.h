@@ -80,6 +80,9 @@ class StatusTab : public brls::List
         StatusCell *socTempCell;
         StatusCell *pcbTempCell;
         StatusCell *skinTempCell;
+        StatusCell *cpuTempCell;
+        StatusCell *gpuTempCell;
+        StatusCell *pllTempCell;
 
         StatusCell *nowPowerCell;
         StatusCell *avgPowerCell;

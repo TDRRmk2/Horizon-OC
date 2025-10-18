@@ -48,6 +48,14 @@ Result GpuVmin(u32 *ptr) {
         PATCH_OFFSET(ptr, (int)C.eristaGpuVmin);
         R_SUCCEED();
 }
+
+Result GpuVmax(u32 *ptr) {
+    if (!C.eristaGpuVmax)
+        R_SKIP();
+
+        PATCH_OFFSET(ptr, (int)C.eristaGpuVmax);
+        R_SUCCEED();
+}
     Result CpuVoltRange(u32 *ptr) {
         u32 min_volt_got = *(ptr - 1);
         for (const auto &mv : CpuMinVolts) {
@@ -185,7 +193,7 @@ void MemMtcTableAutoAdjust(EristaMtcTable *table) {
     WRITE_PARAM_ALL_REG(table, emc_rfcpb,  GET_CYCLE_CEIL(tRFCpb));
     WRITE_PARAM_ALL_REG(table, emc_r2w,    R2W);
     WRITE_PARAM_ALL_REG(table, emc_w2r,    W2R);
-    WRITE_PARAM_ALL_REG(table, emc_trefbw, REFBW);
+    WRITE_PARAM_ALL_REG(table, emc_trefbw, refbw);
 
     WRITE_PARAM_ALL_REG(table, emc_rfc,    GET_CYCLE_CEIL(tRFCab));
     WRITE_PARAM_ALL_REG(table, emc_tppd,   tPPD);
@@ -315,6 +323,7 @@ void MemMtcTableAutoAdjust(EristaMtcTable *table) {
             // {"MEM Freq Dvb", &MemFreqDvbTable, 1, nullptr, EmcClkOSLimit},
             {"MEM Volt", &MemVoltHandler, 2, nullptr, MemVoltHOS},
             {"GPU Vmin", &GpuVmin, 0, nullptr, gpuVmin},
+            {"GPU Vmax", &GpuVmax, 0, nullptr, gpuVmax},
         };
 
         for (uintptr_t ptr = mapped_nso;

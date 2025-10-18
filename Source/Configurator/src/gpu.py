@@ -134,6 +134,14 @@ def populate():
         tag="marikoGpuVmax"
     )
 
+    dpg.add_combo(
+         items=processed_voltages_e,
+         default_value="Disabled",
+         label="Erista GPU vMax",
+         callback=k.grab_kip_storage_values_no_mult,
+         tag="eristaGpuVmax"
+    )
+
     dpg.add_separator(label="Undervolt")
 
     dpg.add_button(
