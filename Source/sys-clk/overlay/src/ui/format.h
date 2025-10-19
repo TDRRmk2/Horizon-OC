@@ -29,7 +29,6 @@
 
 #include <cstdio>
 
-#define FREQ_DEFAULT_TEXT "Default"
 
 static inline std::string formatListFreqMHz(std::uint32_t mhz)
 {

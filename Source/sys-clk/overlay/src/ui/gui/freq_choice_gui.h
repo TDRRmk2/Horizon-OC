@@ -33,7 +33,7 @@
 
 using FreqChoiceListener = std::function<bool(std::uint32_t hz)>;
 
-#define FREQ_DEFAULT_TEXT "Do not override"
+// #define FREQ_DEFAULT_TEXT "Do not override"
 
 class FreqChoiceGui : public BaseMenuGui
 {
