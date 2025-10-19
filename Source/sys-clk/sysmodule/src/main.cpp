@@ -41,6 +41,24 @@
 
 #define INNER_HEAP_SIZE 0x30000
 
+static void powerManagementHandler(AppletHookType hook, void *param)
+{
+    switch (hook)
+    {
+        case AppletHookType_OnOperationMode:
+        case AppletHookType_OnPerformanceMode:
+            // Profile change, nothing special needed
+            break;
+        case AppletHookType_OnResume:
+            // Console waking up
+            FileUtils::LogLine("[main] Resuming from sleep");
+            socthermOnWake();
+            break;
+        default:
+            break;
+    }
+}
+
 extern "C"
 {
     extern std::uint32_t __start__;
@@ -98,7 +116,7 @@ extern "C"
         i2cExit();
         fsExit();
         fsdevUnmountAll();    
-        }
+    }
 }
 
 int main(int argc, char** argv)
@@ -112,21 +130,24 @@ int main(int argc, char** argv)
 
     try
     {
-
         Board::Initialize();
         ProcessManagement::Initialize();
 
         ProcessManagement::WaitForQLaunch();
+
+        // Register power management handler
+        AppletHookCookie powerHookCookie;
+        appletHook(&powerHookCookie, powerManagementHandler, NULL);
 
         ClockManager* clockMgr = new ClockManager();
         IpcService* ipcSrv = new IpcService(clockMgr);
 
         FileUtils::LogLine("Ready");
 
-
         clockMgr->SetRunning(true);
         clockMgr->GetConfig()->SetEnabled(true);
         ipcSrv->SetRunning(true);
+        
         TemperaturePoint *table;
         ReadConfigFile(&table);
         InitFanController(table);
@@ -138,6 +159,9 @@ int main(int argc, char** argv)
             clockMgr->WaitForNextTick();
         }
 
+        // Cleanup
+        appletUnhook(&powerHookCookie);
+        
         ipcSrv->SetRunning(false);
         delete ipcSrv;
         delete clockMgr;

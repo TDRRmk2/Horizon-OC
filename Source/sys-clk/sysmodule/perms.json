@@ -67,6 +67,15 @@
 			}
 		},
 		{
+			"type": "map",
+			"value": {
+				"address": "0x7000F800",
+				"size": "0x400",
+				"is_ro": false,
+				"is_io": true
+			}
+		},
+		{
 			"type": "syscalls",
 			"value": {
 				"svcSetHeapSize": "0x01",
@@ -118,8 +127,10 @@
 				"svcReplyAndReceive": "0x43",
 				"svcReplyAndReceiveWithUserBuffer": "0x44",
 				"svcCreateEvent": "0x45",
-				"svcCreateInterruptEvent": "0x53",
+				"svcMapPhysicalMemory": "0x48",
+				"svcUnmapPhysicalMemory": "0x49",
 				"svcReadWriteRegister": "0x4E",
+				"svcCreateInterruptEvent": "0x53",
 				"svcQueryMemoryMapping": "0x55",
 				"svcCreateDeviceAddressSpace": "0x56",
 				"svcAttachDeviceAddressSpace": "0x57",

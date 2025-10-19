@@ -29,7 +29,7 @@ make -j$CORES
 popd > /dev/null
 
 mkdir -p "$DIST_DIR/switch"
-cp -vf "$ROOT_DIR/manager/sys-clk-manager.nro" "$DIST_DIR/switch/horizon-oc-manager.nro"
+cp -vf "$ROOT_DIR/manager/horizon-oc-manager.nro" "$DIST_DIR/switch/horizon-oc-manager.nro"
 
 echo "*** overlay ***"
 pushd "$ROOT_DIR/overlay"

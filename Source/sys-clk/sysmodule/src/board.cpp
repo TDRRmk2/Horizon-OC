@@ -29,7 +29,10 @@
 #include "board.h"
 #include "errors.h"
 #include "i2c.h"
+#include "file_utils.h"
+#include "thermal.h"
 #include <switch.h>
+
 #define HOSSVC_HAS_CLKRST (hosversionAtLeast(8,0,0))
 #define HOSSVC_HAS_TC (hosversionAtLeast(5,0,0))
 #define HOSSVC_HAS_MM (hosversionAtLeast(10,0,0))
@@ -90,9 +93,6 @@ PcvModuleId Board::GetPcvModuleId(SysClkModule sysclkModule)
 
 void Board::Initialize()
 {
-
-    // socthermInitialize();
-
     Result rc = 0;
 
     if(HOSSVC_HAS_CLKRST)
@@ -124,6 +124,14 @@ void Board::Initialize()
     rc = tmp451Initialize();
     ASSERT_RESULT_OK(rc, "tmp451Initialize");
 
+    // Initialize soctherm for real temperature readings
+    // Note: This may fail on some systems, which is okay
+    if (!socthermInit()) {
+        FileUtils::LogLine("[board] Warning: socthermInit failed, real temps will not be available");
+    } else {
+        FileUtils::LogLine("[board] soctherm initialized successfully (%s)", socthermGetRevisionString());
+    }
+
     FetchHardwareInfos();
 }
 
@@ -148,6 +156,9 @@ void Board::Exit()
 
     max17050Exit();
     tmp451Exit();
+    
+    // Clean up soctherm
+    socthermExit();
 }
 
 SysClkProfile Board::GetProfile()
@@ -426,9 +437,11 @@ void Board::ResetToStockGpu()
         ASSERT_RESULT_OK(rc, "apmExtSysRequestPerformanceMode");
     }
 }
+
 std::uint32_t Board::GetTemperatureMilli(SysClkThermalSensor sensor, bool readRealTemps)
 {
     std::int32_t millis = 0;
+    
     if(sensor == SysClkThermalSensor_SOC)
     {
         millis = tmp451TempSoc();
@@ -445,18 +458,36 @@ std::uint32_t Board::GetTemperatureMilli(SysClkThermalSensor sensor, bool readRe
             rc = tcGetSkinTemperatureMilliC(&millis);
             ASSERT_RESULT_OK(rc, "tcGetSkinTemperatureMilliC");
         }
-    } else if(sensor == HocClkThermalSensor_CPU && readRealTemps) {        
-        millis = socthermReadCpuTemp();
-    } else if(sensor == HocClkThermalSensor_GPU && readRealTemps) {
-        millis = socthermReadGpuTemp();
-    } else if(sensor == HocClkThermalSensor_PLL && readRealTemps) {
-        millis = socthermReadGpuTemp();
+    } 
+    else if(readRealTemps) 
+    {
+        // Extended thermal sensors from soctherm
+        switch(sensor) {
+            case HocClkThermalSensor_CPU: // CPU sensor (first extended sensor)
+                millis = socthermReadCpuTemp();
+                break;
+            case HocClkThermalSensor_GPU: // GPU sensor
+                millis = socthermReadGpuTemp();
+                break;
+            case HocClkThermalSensor_PLL: // PLL sensor
+                millis = socthermReadPllTemp();
+                break;
+            default:
+                millis = 0;
+                break;
+        }
+        
+        // Check for soctherm errors (negative values indicate failure)
+        if (millis < -200000) { // Allow for negative temps down to -200°C (absolute zero is -273°C)
+            FileUtils::LogLine("[board] Warning: soctherm read failed with code %d", millis);
+            millis = 0;
+        }
     }
     else
     {
-        // ASSERT_ENUM_VALID(SysClkThermalSensor, sensor);
         millis = 0;
     }
+    
     return std::max(0, millis);
 }
 
@@ -509,8 +540,10 @@ void Board::FetchHardwareInfos()
     {
         case 2 ... 5:
             g_socType = SysClkSocType_Mariko;
+            FileUtils::LogLine("[board] Detected Mariko (T210B01) SoC");
             break;
         default:
             g_socType = SysClkSocType_Erista;
+            FileUtils::LogLine("[board] Detected Erista (T210) SoC");
     }
 }
