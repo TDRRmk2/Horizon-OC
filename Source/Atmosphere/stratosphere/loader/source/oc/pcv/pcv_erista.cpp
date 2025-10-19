@@ -312,7 +312,7 @@ void MemMtcTableAutoAdjust(EristaMtcTable *table) {
         PatcherEntry<u32> patches[] = {
             {"CPU Freq Vdd",   &CpuFreqVdd,            1, nullptr, CpuClkOSLimit },
             {"CPU Freq Table", CpuFreqCvbTable<false>, 1, nullptr, CpuCvbDefaultMaxFreq},
-            {"CPU Volt Limit", &CpuVoltRange,         13, nullptr, CpuVoltOfficial },
+            {"CPU Volt Limit", &CpuVoltRange,          0, &CpuMaxVoltPatternFn },
             {"CPU Volt Dfll",  &CpuVoltDfll,           1, nullptr, 0xFFEAD0FF },
             {"GPU Freq Table", GpuFreqCvbTable<false>, 1, nullptr, GpuCvbDefaultMaxFreq},
             {"GPU Freq Asm", &GpuFreqMaxAsm, 2, &GpuMaxClockPatternFn},
