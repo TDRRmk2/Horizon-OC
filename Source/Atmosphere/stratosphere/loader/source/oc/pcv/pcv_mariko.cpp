@@ -252,9 +252,11 @@ namespace ams::ldr::oc::pcv::mariko
         }
     }
 
+/* Unholly commenting shit to make werror shut up. (No time to do it properly atm) */
+/* TODO: Implement mariko.
     void MemMtcTableAutoAdjust(MarikoMtcTable *table)
     {
-        /* Official Tegra X1 TRM, sign up for nvidia developer program (free) to download:
+         Official Tegra X1 TRM, sign up for nvidia developer program (free) to download:
          *     https://developer.nvidia.com/embedded/dlc/tegra-x1-technical-reference-manual
          *     Section 18.11: MC Registers
          *
@@ -269,7 +271,7 @@ namespace ams::ldr::oc::pcv::mariko
          *
          * If you have access to LPDDR4(X) specs or datasheets (from manufacturers or Google),
          * you'd better calculate timings yourself rather than relying on following algorithm.
-         */
+         /
 
         if (C.mtcConf != AUTO_ADJ)
         {
@@ -303,7 +305,7 @@ namespace ams::ldr::oc::pcv::mariko
         WRITE_PARAM_ALL_REG(table, emc_w2r, W2R);
         WRITE_PARAM_ALL_REG(table, emc_w2p, WTP);
 
-        /* May or may not have to be patched in Micron; let's skip for now. */
+         May or may not have to be patched in Micron; let's skip for now.
         if (!IsMicron())
         {
             WRITE_PARAM_ALL_REG(table, emc_pdex2wr, GET_CYCLE_CEIL(tXP));
@@ -317,14 +319,14 @@ namespace ams::ldr::oc::pcv::mariko
         WRITE_PARAM_ALL_REG(table, emc_trpab, GET_CYCLE_CEIL(tRPab));
         WRITE_PARAM_ALL_REG(table, emc_trefbw, REFBW);
 
-/* Worth replacing with l4t dumps at some point. */
-// Burst MC Regs
+ Worth replacing with l4t dumps at some point. /
+ Burst MC Regs
 #define WRITE_PARAM_BURST_MC_REG(TABLE, PARAM, VALUE) TABLE->burst_mc_regs.PARAM = VALUE;
 
         constexpr u32 MC_ARB_DIV = 4;
         constexpr u32 MC_ARB_SFA = 2;
 
-        WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_cfg, C.marikoEmcMaxClock / (33.3 * 1000) / MC_ARB_DIV); // CYCLES_PER_UPDATE: The number of mcclk cycles per deadline timer update
+        WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_cfg, C.marikoEmcMaxClock / (33.3 * 1000) / MC_ARB_DIV); CYCLES_PER_UPDATE: The number of mcclk cycles per deadline timer update
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_rcd, CEIL(GET_CYCLE_CEIL(tRCD) / MC_ARB_DIV) - 2)
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_rp, CEIL(GET_CYCLE_CEIL(tRPpb) / MC_ARB_DIV) - 1 + MC_ARB_SFA)
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_rc, CEIL(GET_CYCLE_CEIL(tRC) / MC_ARB_DIV) - 1)
@@ -337,7 +339,7 @@ namespace ams::ldr::oc::pcv::mariko
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_r2w, CEIL((R2W) / MC_ARB_DIV) - 1 + MC_ARB_SFA)
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_w2r, CEIL((W2R) / MC_ARB_DIV) - 1 + MC_ARB_SFA)
         WRITE_PARAM_BURST_MC_REG(table, mc_emem_arb_timing_rfcpb, CEIL(GET_CYCLE_CEIL(tRFCpb) / MC_ARB_DIV))
-    }
+    }*/
 
     void MemMtcPllmbDivisor(MarikoMtcTable *table)
     {
@@ -395,7 +397,8 @@ namespace ams::ldr::oc::pcv::mariko
         // Copy unmodified 1600000 table to tmp
         std::memcpy(reinterpret_cast<void *>(tmp), reinterpret_cast<void *>(table_max), sizeof(MarikoMtcTable));
         // Adjust max freq mtc timing parameters with reference to 1331200 table
-        MemMtcTableAutoAdjust(table_max);
+        /* TODO: Implement mariko */
+        // MemMtcTableAutoAdjust(table_max);
         MemMtcPllmbDivisor(table_max);
         // Overwrite 13312000 table with unmodified 1600000 table copied back
         std::memcpy(reinterpret_cast<void *>(table_alt), reinterpret_cast<void *>(tmp), sizeof(MarikoMtcTable));

@@ -30,6 +30,8 @@ namespace ams::ldr::oc {
 
 volatile CustomizeTable C = {
 
+.hpMode = DISABLED,
+
 .commonCpuBoostClock = 1785000, // Default boost clock
 
 .commonEmcMemVolt  = 1175000, // LPDDR4X JEDEC Specification

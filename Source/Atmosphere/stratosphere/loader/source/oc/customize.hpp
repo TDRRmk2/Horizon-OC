@@ -45,6 +45,7 @@
      u8  cust[4] = {'C', 'U', 'S', 'T'};
      u32 custRev = CUST_REV;
      u32 mtcConf = AUTO_ADJ;
+     bool hpMode;
      u32 commonCpuBoostClock;
      u32 commonEmcMemVolt;
      u32 eristaCpuMaxVolt;
@@ -78,7 +79,7 @@
      u32 t7_tWTR;
      u32 t8_tREFI;
      u32 mem_burst_latency;
-     
+
      u32 marikoCpuVmin;
 
      u32 eristaGpuVmin;
