@@ -51,8 +51,8 @@ static void powerManagementHandler(AppletHookType hook, void *param)
             break;
         case AppletHookType_OnResume:
             // Console waking up
-            FileUtils::LogLine("[main] Resuming from sleep");
-            socthermOnWake();
+            // FileUtils::LogLine("[main] Resuming from sleep");
+            // socthermOnWake();
             break;
         default:
             break;

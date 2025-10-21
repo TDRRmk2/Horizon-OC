@@ -209,6 +209,40 @@ namespace ams::ldr::oc::pcv
 
         constexpr u32 GpuClkPllLimit = 921'600'000;
 
+        constexpr emc_dvb_dvfs_table_t EmcDvbTableDefault[] = {
+            {204000, {
+                         637,
+                         650,
+                         675,
+                     }},
+            {408000, {
+                         700,
+                         725,
+                         750,
+                     }},
+            {800000, {
+                         775,
+                         800,
+                         825,
+                     }},
+            {1065600, {
+                          850,
+                          875,
+                          900,
+                      }},
+            {1331200, {
+                          925,
+                          950,
+                          975,
+                      }},
+            {1600000, {
+                          1000,
+                          1025,
+                          1050,
+                      }},
+        };
+
+
         /* GPU Max Clock asm Pattern:
          *
          * MOV W11, #0x1000 MOV (wide immediate)                0x1000                              0xB (11)

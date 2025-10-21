@@ -8,23 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-/*
- *
- * Copyright (c) Souldbminer and Horizon OC Contributors
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
 #include <stdint.h>
@@ -35,8 +18,6 @@ typedef enum
 {
     SysClkSocType_Erista = 0,
     SysClkSocType_Mariko,
-    HocClkSocType_MarikoLite,
-    HocClkSocType_Drake, // Maybe someday :(
     SysClkSocType_EnumMax
 } SysClkSocType;
 
@@ -63,11 +44,6 @@ typedef enum
     SysClkThermalSensor_SOC = 0,
     SysClkThermalSensor_PCB,
     SysClkThermalSensor_Skin,
-    HocClkThermalSensor_CPU,
-    HocClkThermalSensor_GPU,
-    HocClkThermalSensor_PLL,
-    HocClkThermalSensor_EristaEMC,
-    HocClkThermalSensor_MarikoEMC,
     SysClkThermalSensor_EnumMax
 } SysClkThermalSensor;
 
@@ -84,23 +60,6 @@ typedef enum
     SysClkRamLoad_Cpu,
     SysClkRamLoad_EnumMax
 } SysClkRamLoad;
-
-typedef enum
-{
-    HocClkPartLoad_CPU = 0,
-    HocClkPartLoad_GPU,
-    HocClkPartLoad_EMC,
-    HocClkPartLoad_EnumMax,
-} HocClkPartLoad;
-
-typedef enum
-{
-    ReverseNX_NotFound = 0,
-    ReverseNX_SystemDefault = 0,
-    ReverseNX_Handheld,
-    ReverseNX_Docked,
-} ReverseNXMode;
-
 
 #define SYSCLK_ENUM_VALID(n, v) ((v) < n##_EnumMax)
 
@@ -129,10 +88,6 @@ static inline const char* sysclkFormatThermalSensor(SysClkThermalSensor thermSen
             return pretty ? "PCB" : "pcb";
         case SysClkThermalSensor_Skin:
             return pretty ? "Skin" : "skin";
-        case HocClkThermalSensor_CPU:
-            return pretty ? "CPU" : "cpu";
-        case HocClkThermalSensor_GPU:
-            return pretty ? "GPU" : "gpu";
         default:
             return NULL;
     }
@@ -164,22 +119,7 @@ static inline const char* sysclkFormatProfile(SysClkProfile profile, bool pretty
         case SysClkProfile_HandheldChargingUSB:
             return pretty ? "USB Charger" : "handheld_charging_usb";
         case SysClkProfile_HandheldChargingOfficial:
-            return pretty ? "PD Charger" : "handheld_charging_official";
-        default:
-            return NULL;
-    }
-}
-
-static inline const char* hocClkFormatPartLoad(HocClkPartLoad load, bool pretty)
-{
-    switch(load)
-    {
-        case HocClkPartLoad_CPU:
-            return pretty ? "CPU Load" : "cpul";
-        case HocClkPartLoad_GPU:
-            return pretty ? "GPU Load" : "gpul";
-        case HocClkPartLoad_EMC:
-            return pretty ? "RAM Load" : "emcl";
+            return pretty ? "Official Charger" : "handheld_charging_official";
         default:
             return NULL;
     }

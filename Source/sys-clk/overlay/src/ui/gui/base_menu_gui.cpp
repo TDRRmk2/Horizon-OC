@@ -29,6 +29,19 @@
 #include "fatal_gui.h"
 
 // Cache hardware model to avoid repeated syscalls
+uint64_t systemtickfrequency = 19200000;
+
+std::atomic<uint64_t> idletickcpul0{systemtickfrequency};
+std::atomic<uint64_t> idletickcpul1{systemtickfrequency};
+std::atomic<uint64_t> idletickcpul2{systemtickfrequency};
+std::atomic<uint64_t> idletickcpul3{systemtickfrequency};
+
+uint64_t idle0;
+uint64_t idle1;
+uint64_t idle2;
+uint64_t idle3;
+
+double maxLoad;
 
 BaseMenuGui::BaseMenuGui()
 {
@@ -108,9 +121,9 @@ void BaseMenuGui::preDraw(tsl::gfx::Renderer* renderer) {
     y = y + 20; // Direct assignment (129 + 20)
     
     // === REAL FREQUENCIES ===
-    renderer->drawString(displayStrings[5], false, dataPositions[0], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // CPU real
-    renderer->drawString(displayStrings[6], false, dataPositions[1], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // GPU real
-    renderer->drawString(displayStrings[7], false, dataPositions[2], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // MEM real
+    renderer->drawString(displayStrings[5], false, positions[2], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // CPU real
+    renderer->drawString(displayStrings[6], false, positions[3], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // GPU real
+    renderer->drawString(displayStrings[7], false, positions[4], y, SMALL_TEXT_SIZE, tsl::infoTextColor);  // MEM real
     
     y = y + 20; // Direct assignment (149 + 20)
     
@@ -168,7 +181,20 @@ void BaseMenuGui::preDraw(tsl::gfx::Renderer* renderer) {
 
 // Optimized refresh - now does all the string formatting once per second
 void BaseMenuGui::refresh()
-{
+{           
+    idle0 = idletickcpul0.load(std::memory_order_acquire);
+    idle1 = idletickcpul1.load(std::memory_order_acquire);
+    idle2 = idletickcpul2.load(std::memory_order_acquire);
+    idle3 = idletickcpul3.load(std::memory_order_acquire);
+
+    maxLoad = std::max({
+        1.0 - static_cast<double>(idle0) / systemtickfrequency,
+        1.0 - static_cast<double>(idle1) / systemtickfrequency,
+        1.0 - static_cast<double>(idle2) / systemtickfrequency,
+        1.0 - static_cast<double>(idle3) / systemtickfrequency
+    }) * 100.0;
+
+    
     const u64 ticks = armGetSystemTick();
     // Use cached comparison - 1 billion nanoseconds
     if (armTicksToNs(ticks - this->lastContextUpdate) <= 1000000000UL) [[likely]] {
@@ -262,7 +288,7 @@ void BaseMenuGui::refresh()
     
     // Real frequencies
     hz = context->realFreqs[0]; // CPU
-    sprintf(displayStrings[5], "%u.%u MHz", hz / 1000000U, (hz / 100000U) % 10U);
+    sprintf(displayStrings[5], "%3lf%% %u.%u MHz", maxLoad, hz / 1000000U, (hz / 100000U) % 10U);
     
     hz = context->realFreqs[1]; // GPU
     sprintf(displayStrings[6], "%u.%u MHz", hz / 1000000U, (hz / 100000U) % 10U);

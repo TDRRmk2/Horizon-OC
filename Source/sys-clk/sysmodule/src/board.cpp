@@ -126,11 +126,11 @@ void Board::Initialize()
 
     // Initialize soctherm for real temperature readings
     // Note: This may fail on some systems, which is okay
-    if (!socthermInit()) {
-        FileUtils::LogLine("[board] Warning: socthermInit failed, real temps will not be available");
-    } else {
-        FileUtils::LogLine("[board] soctherm initialized successfully (%s)", socthermGetRevisionString());
-    }
+    // if (!socthermInit()) {
+    //     FileUtils::LogLine("[board] Warning: socthermInit failed, real temps will not be available");
+    // } else {
+    //     FileUtils::LogLine("[board] soctherm initialized successfully (%s)", socthermGetRevisionString());
+    // }
 
     FetchHardwareInfos();
 }

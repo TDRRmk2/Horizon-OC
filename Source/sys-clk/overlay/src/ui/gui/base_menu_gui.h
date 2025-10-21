@@ -31,6 +31,7 @@
 #include "../../ipc.h"
 #include "base_gui.h"
 
+
 class BaseMenuGui : public BaseGui
 {
     protected:
@@ -43,6 +44,7 @@ class BaseMenuGui : public BaseGui
 		std::uint32_t vddVoltageUv;//add vdd2 voltage
 
     public:
+        uint64_t systemtickfrequency = 19200000;
         bool g_hardwareModelCached = false;
         bool g_isMariko = false;
 
