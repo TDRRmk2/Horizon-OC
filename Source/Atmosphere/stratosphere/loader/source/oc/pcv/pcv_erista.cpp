@@ -592,12 +592,15 @@ namespace ams::ldr::oc::pcv::erista {
         const u32 mc_tRAS = MIN(GET_CYCLE(tRAS), (u32) 0x7F);
         const u32 mc_tRRD = MIN(GET_CYCLE(tRRD), (u32) 31);
 
+        table->burst_mc_regs.mc_emem_arb_cfg = (int)(((double) C.eristaEmcMaxClock / 33300.0) * 0.25);
         table->burst_mc_regs.mc_emem_arb_timing_ras = (int) ((double) (mc_tRAS >> 2) - 2.0);
         table->burst_mc_regs.mc_emem_arb_timing_rcd = (int) ((double) (GET_CYCLE(tRCD) >> 2) - 2.0);
         table->burst_mc_regs.mc_emem_arb_timing_rp = (int) (((double) (GET_CYCLE(tRPpb) >> 2) - 1.0) + 2.0);
         table->burst_mc_regs.mc_emem_arb_timing_rc = (int) ((double) (GET_CYCLE(tRC) >> 2) - 1.0);
         table->burst_mc_regs.mc_emem_arb_timing_faw = (int) ((double)(GET_CYCLE(tFAW) >> 2) - 1.0);
         table->burst_mc_regs.mc_emem_arb_timing_rrd = (int)((double)(mc_tRRD >> 2) - 1.0);
+        table->burst_mc_regs.mc_emem_arb_timing_rap2pre = 3;
+        table->burst_mc_regs.mc_emem_arb_timing_wap2pre = 11;
         table->burst_mc_regs.mc_emem_arb_timing_r2w = (uint)(((double)((uint)tR2W >> 2) - 1.0) + 2.0);
         table->burst_mc_regs.mc_emem_arb_timing_w2r = (uint)(((double)(tW2R >> 2) - 1.0) + 2.0);
 
