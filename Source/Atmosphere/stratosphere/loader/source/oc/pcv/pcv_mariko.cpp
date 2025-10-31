@@ -190,13 +190,11 @@ namespace ams::ldr::oc::pcv::mariko
         R_SUCCEED();
     }
 
-    Result GpuFreqPllLimit(u32 *ptr)
-    {
+    Result GpuFreqPllLimit(u32 *ptr) {
         clk_pll_param *entry = reinterpret_cast<clk_pll_param *>(ptr);
 
         // All zero except for freq
-        for (size_t i = 1; i < sizeof(clk_pll_param) / sizeof(u32); i++)
-        {
+        for (size_t i = 1; i < sizeof(clk_pll_param) / sizeof(u32); i++) {
             R_UNLESS(*(ptr + i) == 0, ldr::ResultInvalidGpuPllEntry());
         }
 
@@ -533,7 +531,7 @@ namespace ams::ldr::oc::pcv::mariko
             {"CPU Volt Dfll", &CpuVoltDfll, 1, nullptr, 0x0000FFCF},
             {"GPU Freq Table", GpuFreqCvbTable<true>, 1, nullptr, GpuCvbDefaultMaxFreq},
             {"GPU Freq Asm", &GpuFreqMaxAsm, 2, &GpuMaxClockPatternFn},
-            {"GPU Freq PLL", &GpuFreqPllLimit, 1, nullptr, GpuClkPllLimit},
+            {"GPU Freq PLL", &GpuFreqPllLimit, 0, nullptr, GpuClkPllLimit},
             {"MEM Freq Mtc", &MemFreqMtcTable, 0, nullptr, EmcClkOSLimit},
             {"MEM Freq Dvb", &MemFreqDvbTable, 1, nullptr, EmcClkOSLimit},
             {"MEM Freq Max", &MemFreqMax, 0, nullptr, EmcClkOSLimit},
