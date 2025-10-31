@@ -40,6 +40,6 @@ mkdir -p "$DIST_DIR/switch/.overlays"
 cp -vf "$ROOT_DIR/overlay/out/horizon-oc-overlay.ovl" "$DIST_DIR/switch/.overlays/horizon-oc-overlay.ovl"
 
 echo "*** assets ***"
-mkdir -p "$DIST_DIR/config/sys-clk"
-cp -vf "$ROOT_DIR/config.ini.template" "$DIST_DIR/config/sys-clk/config.ini.template"
+mkdir -p "$DIST_DIR/config/horizon-oc"
+cp -vf "$ROOT_DIR/config.ini.template" "$DIST_DIR/config/horizon-oc/config.ini.template"
 cp -vf "$ROOT_DIR/../../README.md" "$DIST_DIR/README.md"

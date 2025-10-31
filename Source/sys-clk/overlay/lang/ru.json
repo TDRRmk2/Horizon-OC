@@ -30,6 +30,6 @@
     "PD Charger   Reset": "Офиц. зарядка   Сброс",
     "USB Charger   Reset": "USB зарядка   Сброс",
     "Memory": "RAM",
-    "Do not override": "По умолчанию",
+    "Default": "По умолчанию",
     "Profile": "Профиль"
 }
