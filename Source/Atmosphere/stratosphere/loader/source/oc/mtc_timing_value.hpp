@@ -74,9 +74,9 @@ namespace ams::ldr::oc {
         const u32 tFAW = (u32) (tRRD * 4.0);
 
         /* Latency stuff. */
-        const u32 tR2W = (u32)(((((double)(long)(3.5 / tCK_avg) + 32.0 + (BL / 2)) - 14.0) + tWPRE + 12.0) - (double)(C.t6_tRTW * 3));
-        const u32 tW2R = static_cast<u32>((static_cast<long>(tWTR / tCK_avg) + 23.0) - (BL / 2.0));
-        const u32 tRW2PDEN = (u32) ((double) (u64)(1.25 / tCK_avg) + 46.0 + (double) (u64)(0.8 / tCK_avg) + 6.0);
+        const int tR2W = (int)((3.5 / tCK_avg) + 32 + (BL / 2) - 14 - 6 + tWPRE + 12 - (C.t6_tRTW * 3));
+        const int tW2R = (int)((tWTR / tCK_avg) + 18 - (BL / 2));
+        const int tRW2PDEN = (int)((1.25 / tCK_avg) + 46 + (0.8 / tCK_avg) + 6);
 
         /* Refresh Cycle time. (All Banks) */
         const u32 tRFCab = tRFCpb * 2;
@@ -94,7 +94,7 @@ namespace ams::ldr::oc {
         const double tXP = 7.5; // I assume this is correct.
 
         /* u32ernal READ to PRECHARGE command delay. */
-        const u32 pdex2mrr = (u32) (tCK_avg * 3.0 + (double) tRCD_values[C.t1_tRCD] + 10.0);
+        const int pdex2mrr = (tCK_avg * 3.0) + tRCD_values[C.t1_tRCD] + 1;
 
         /* Row Precharge Time. (all banks) */
         const double tRPab = tRPpb + 3;

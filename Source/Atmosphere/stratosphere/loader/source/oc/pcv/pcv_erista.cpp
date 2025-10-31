@@ -178,24 +178,24 @@ namespace ams::ldr::oc::pcv::erista {
 
         /* This condition is insane but it's done in eos. */
         /* Need to clean up at some point. */
-        u32 rext;
-        u32 wext;
-        if (C.eristaEmcMaxClock < 3200001) {
-            if (C.eristaEmcMaxClock < 2133001) {
-                rext = 26;
-                wext = 22;
-            } else {
-                rext = 28;
-                wext = 22;
-
-                if (2400000 < C.eristaEmcMaxClock) {
-                    wext = 25;
-                }
-            }
-        } else {
-            rext = 30;
-            wext = 25;
-        }
+      //  u32 rext;
+      //  u32 wext;
+      //  if (C.eristaEmcMaxClock < 3200001) {
+      //      if (C.eristaEmcMaxClock < 2133001) {
+      //          rext = 26;
+      //          wext = 22;
+      //      } else {
+      //          rext = 28;
+      //          wext = 22;
+      //
+      //          if (2400000 < C.eristaEmcMaxClock) {
+      //              wext = 25;
+      //          }
+      //      }
+      //  } else {
+      //      rext = 30;
+      //      wext = 25;
+      //  }
 
         u32 refresh_raw = 0xFFFF;
         u32 trefbw = 0;
@@ -415,7 +415,7 @@ namespace ams::ldr::oc::pcv::erista {
         table->burst_mc_regs.mc_emem_arb_timing_r2w = (uint) (((double) ((uint) tR2W      >> 2) - 1.0) + 2.0);
         table->burst_mc_regs.mc_emem_arb_timing_w2r = (uint) (((double) (tW2R             >> 2) - 1.0) + 2.0);
 
-        table->burst_mc_regs.mc_emem_arb_da_turns     = (val & 0x0000FFFF) | (tW2R << 24) | (tR2W << 16);
+        table->burst_mc_regs.mc_emem_arb_da_turns     = (table->burst_mc_regs.mc_emem_arb_da_turns & 0x0000FFFF) | (mc_tW2R << 24) | (mc_tR2W << 16);
         table->burst_mc_regs.mc_emem_arb_da_covers    = (((uint)                    (mc_tRCD + 3 + mc_tRPpb) >> 1 & 0xff)    << 8) | (((uint) (mc_tRCD + 11 + mc_tRPpb) >> 1 & 0xff) << 0x10) | ((mc_tRC >> 1) & 0xff);
         table->burst_mc_regs.mc_emem_arb_misc0        = (table->burst_mc_regs.mc_emem_arb_misc0 & 0xffe08000U) | ((mc_tRC + 1) & 0xff); /* Missing in l4t dump? TODO */
         table->burst_mc_regs.mc_emem_arb_timing_rfcpb = GET_CYCLE(tRFCpb) >> 2;

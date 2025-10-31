@@ -30,56 +30,56 @@ namespace ams::ldr::oc {
 
 volatile CustomizeTable C = {
 
-.mtcConf = AUTO_ADJ,
+.mtcConf = AUTO_ADJ_BL,
 
 .hpMode = DISABLED,
 
 .commonCpuBoostClock = 1785000, // Default boost clock
 
-.commonEmcMemVolt = 1175000, // LPDDR4X JEDEC Specification
+.commonEmcMemVolt = 1212500, // LPDDR4X JEDEC Specification
 
 .eristaCpuMaxVolt  = 1235,
 
-.eristaEmcMaxClock = 1600000, // Maximum HB-MGCH ram rating
+.eristaEmcMaxClock = 2300000, // Maximum HB-MGCH ram rating
 
 .marikoCpuMaxVolt = 1120,
 
-.marikoEmcMaxClock = 1862400, // Hynix NME and Samsung AM-MGCJ Rating (others are 4766MT, 2133MHz)
+.marikoEmcMaxClock = 1866000, // Hynix NME and Samsung AM-MGCJ Rating (others are 4766MT, 2133MHz)
 
-.marikoEmcVddqVolt = 600000,
+.marikoEmcVddqVolt = 640000,
 
-.marikoCpuUV = 0, // No undervolt
+.marikoCpuUV = 5, // No undervolt
 
-.marikoGpuUV = 0,
+.marikoGpuUV = 3,
 
 .eristaCpuUV = 0,
 
-.eristaGpuUV = 0,
+.eristaGpuUV = 3,
 
-.enableMarikoGpuUnsafeFreqs = DISABLED,
+.enableMarikoGpuUnsafeFreqs = ENABLED,
 
-.enableEristaGpuUnsafeFreqs = DISABLED,
+.enableEristaGpuUnsafeFreqs = ENABLED,
 
-.enableMarikoCpuUnsafeFreqs = DISABLED,
+.enableMarikoCpuUnsafeFreqs = ENABLED,
 
-.enableEristaCpuUnsafeFreqs = DISABLED,
+.enableEristaCpuUnsafeFreqs = ENABLED,
 
 .commonGpuVoltOffset = 0,
 
-.EmcDvbShift = 0,
+.EmcDvbShift = 5,
 
 // Defaults - (3-3-2) 0-1-4-3-6
 
 // Primary
-.t1_tRCD = 0,
-.t2_tRP  = 0,
-.t3_tRAS = 0,
+.t1_tRCD = 5,
+.t2_tRP  = 7,
+.t3_tRAS = 8,
 // Secondary
-.t4_tRRD = 0,
-.t5_tRFC = 0,
-.t6_tRTW = 0,
-.t7_tWTR = 0,
-.t8_tREFI= 0,
+.t4_tRRD = 1,
+.t5_tRFC = 2,
+.t6_tRTW = 5,
+.t7_tWTR = 4,
+.t8_tREFI= 6,
 
 // .mem_burst_latency = 0, // 0 - 1600l, 1 = 1866bl, 2 = 2133bl /* TODO: Remove/fix. */
 
@@ -89,7 +89,7 @@ volatile CustomizeTable C = {
 
 .marikoGpuVmin = 610,
 
-.marikoGpuVmax = 800,
+.marikoGpuVmax = 850,
 // NOTE: These tables should NOT BE USED and are only here as placeholders. Always try and find your own optimal tables.
 // Ensure the voltages actually increase or stay the sameot
 
@@ -110,11 +110,11 @@ volatile CustomizeTable C = {
     710  /* 1075 */,
     735  /* 1152 */,
     785  /* 1228 */,
-    0    /* 1267  (Disabled by default) */,
-    0    /* 1305  (Disabled by default) */,
-    0    /* 1344  (Disabled by default) */,
-    0    /* 1382  (Disabled by default) */,
-    0    /* 1420  (Disabled by default) */,
+    780    /* 1267  (Disabled by default) */,
+    805    /* 1305  (Disabled by default) */,
+    870    /* 1344  (Disabled by default) */,
+    870    /* 1382  (Disabled by default) */,
+    870    /* 1420  (Disabled by default) */,
     0    /* 1459  (Disabled by default) */,
     0    /* 1497  (Disabled by default) */,
     0    /* 1536  (Disabled by default) */,
@@ -133,9 +133,9 @@ volatile CustomizeTable C = {
     875  /* 691  */,
     900  /* 768  */,
     950  /* 844  */,
-    975  /* 921  */,
-    0    /* 998  (Disabled by default) */,
-    0    /* 1075 (Disabled by default) */,
+    887  /* 921  */,
+    950    /* 998  (Disabled by default) */,
+    995    /* 1075 (Disabled by default) */,
 },
 
 
@@ -225,7 +225,7 @@ volatile CustomizeTable C = {
     {  768000, { }, { 1191317, 8144, -940, 808, -21583, 226 } },
     {  844800, { }, { 1233208, 8144, -940, 808, -21583, 226 } },
     {  921600, { }, { 1275100, 8144, -940, 808, -21583, 226 } },
-//    {  998400, { }, { 1316991, 8144, -940, 808, -21583, 226 } },
+    {  998400, { }, { 1316991, 8144, -940, 808, -21583, 226 } },
 //  {  1075200, { }, { 1358882, 8144, -940, 808, -21583, 226 } },
 
 },
@@ -243,7 +243,7 @@ volatile CustomizeTable C = {
     {  768000, { }, { 1107534, 8144, -940, 808, -21583, 226 } },
     {  844800, { }, { 1149426, 8144, -940, 808, -21583, 226 } },
     {  921600, { }, { 1191317, 8144, -940, 808, -21583, 226 } },
-//    {  998400, { }, { 1275100, 8144, -940, 808, -21583, 226 } },
+    {  998400, { }, { 1275100, 8144, -940, 808, -21583, 226 } },
 //  { 1075200, { }, { 1316991, 8144, -940, 808, -21583, 226 } },
 },
 
