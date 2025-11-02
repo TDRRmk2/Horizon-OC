@@ -244,6 +244,21 @@ void MiscGui::listUI()
         addFreqButton(HocClkConfigValue_EristaMaxGpuClock, nullptr, SysClkModule_GPU);
         addFreqButton(HocClkConfigValue_EristaMaxMemClock, nullptr, SysClkModule_MEM);
     }
+    tsl::elm::ListItem* applyBtn = new tsl::elm::ListItem("Apply EMC Regs");
+    applyBtn->setClickListener([](u64 keys) {
+        if (keys & HidNpadButton_A) {
+            Result rc = hocClkIpcUpdateEmcRegs();
+            if (R_FAILED(rc)) {
+                FatalGui::openWithResultCode("hocClkIpcUpdateEmcRegs", rc);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    });
+    this->listElement->addItem(applyBtn);
+
+
 }
 
 void MiscGui::refresh() {

@@ -148,3 +148,9 @@ Result sysclkIpcSetReverseNXRTMode(ReverseNXMode mode)
 {
     return serviceDispatchIn(&g_sysclkSrv, SysClkIpcCmd_SetReverseNXRTMode, mode);
 }
+
+Result hocClkIpcUpdateEmcRegs()
+{
+    int nil = 0;
+    return serviceDispatchIn(&g_sysclkSrv, SysClkIpcCmd_SetReverseNXRTMode, nil);
+}
