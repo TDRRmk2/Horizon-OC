@@ -2,3 +2,5 @@
 .vscode/
 dist/
 .pyc
+build/
+__pycache__/
