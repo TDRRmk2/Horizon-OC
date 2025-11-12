@@ -281,13 +281,15 @@ void ClockManager::Tick()
         for (unsigned int module = 0; module < SysClkModule_EnumMax; module++)
         {
                 targetHz = this->context->overrideFreqs[module];
+                globalTargetHz = this->context->overrideFreqs[module];
 
                 if (!targetHz)
                 {
                     targetHz = this->config->GetAutoClockHz(this->context->applicationId, (SysClkModule)module, this->context->profile);
+                    globalTargetHz = this->config->GetAutoClockHz(SYSCLK_GLOBAL_PROFILE_TID, (SysClkModule)module, this->context->profile);
                 }
 
-                if (targetHz)
+                if (targetHz || globalTargetHz)
                 {
                     maxHz = this->GetMaxAllowedHz((SysClkModule)module, this->context->profile);
                     nearestHz = this->GetNearestHz((SysClkModule)module, targetHz, maxHz);
