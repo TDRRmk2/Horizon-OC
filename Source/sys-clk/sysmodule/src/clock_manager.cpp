@@ -228,50 +228,69 @@ void ClockManager::RefreshFreqTableRow(SysClkModule module)
 
 void ClockManager::Tick()
 {
+    std::uint32_t mode = 0;
+    AppletOperationMode opMode = appletGetOperationMode();
+    Result rc = apmExtGetCurrentPerformanceConfiguration(&mode);
+    ASSERT_RESULT_OK(rc, "apmExtGetCurrentPerformanceConfiguration");
+
+
+    if(this->config->GetConfigValue(HocClkConfigValue_EMCDVFS)) { 
+
+        #define DEFAULT_FREQ_MHZ 1600
+        #define DEFAULT_FREQ_MHZ_M 1862
+
+        int ram_mhz = Board::GetHz((SysClkModule)SysClkModule_MEM) / 1000000;
+
+        if (Board::GetSocType() == SysClkSocType_Mariko) {
+            if(ram_mhz > DEFAULT_FREQ_MHZ_M)
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
+            else
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUVStockMariko));
+        } else {
+            if(ram_mhz > DEFAULT_FREQ_MHZ)
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
+            else
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUVStockErista));
+        }
+    }
+
+    if(this->config->GetConfigValue(HocClkConfigValue_HandheldTDP) && opMode == AppletOperationMode_Handheld) {
+            if(Board::GetSocType() == SysClkSocType_MarikoLite) {
+                if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_LiteTDPLimit)) {
+                    ResetToStockClocks();
+                    return;
+                }
+            } else {
+                if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_HandheldTDPLimit)) {
+                    ResetToStockClocks();
+                    return;
+                }
+            }
+    } else if(opMode == AppletOperationMode_Console && this->config->GetConfigValue(HocClkConfigValue_EnforceBoardLimit)) {
+        if(Board::GetPowerMw(SysClkPowerSensor_Avg) < 0) {
+            ResetToStockClocks();
+            return;
+        }
+    }
+
+    if(((tmp451TempSoc() / 1000) > (int)this->config->GetConfigValue(HocClkConfigValue_ThermalThrottleThreshold)) && this->config->GetConfigValue(HocClkConfigValue_ThermalThrottle)) {
+        ResetToStockClocks();
+        return;
+    }
+
     std::scoped_lock lock{this->contextMutex};
     if (this->RefreshContext() || this->config->Refresh())
     {
         std::uint32_t targetHz = 0;
         std::uint32_t maxHz = 0;
         std::uint32_t nearestHz = 0;
-        std::uint32_t mode = 0;
-
-        if(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV) < 1400000) { // Safety Check
-            set_sd1_voltage((u32)this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
-        }
-
-        AppletOperationMode opMode = appletGetOperationMode();
-        Result rc = apmExtGetCurrentPerformanceConfiguration(&mode);
-        ASSERT_RESULT_OK(rc, "apmExtGetCurrentPerformanceConfiguration");
-
-        if(this->config->GetConfigValue(HocClkConfigValue_HandheldTDP) && opMode == AppletOperationMode_Handheld) {
-                if(Board::GetSocType() == SysClkSocType_MarikoLite) {
-                    if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_LiteTDPLimit)) {
-                        ResetToStockClocks();
-                        return;
-                    }
-                } else {
-                    if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_HandheldTDPLimit)) {
-                        ResetToStockClocks();
-                        return;
-                    }
-                }
-            } else if(opMode == AppletOperationMode_Console && this->config->GetConfigValue(HocClkConfigValue_EnforceBoardLimit)) {
-                if(Board::GetPowerMw(SysClkPowerSensor_Avg) < 0) {
-                    ResetToStockClocks();
-                    return;
-                }
-            }
 
         if(apmExtIsBoostMode(mode) && !this->config->GetConfigValue(HocClkConfigValue_OverwriteBoostMode)) {
             ResetToStockClocks();
             return;
         }
 
-        if(((tmp451TempSoc() / 1000) > (int)this->config->GetConfigValue(HocClkConfigValue_ThermalThrottleThreshold)) && this->config->GetConfigValue(HocClkConfigValue_ThermalThrottle)) {
-            ResetToStockClocks();
-            return;
-        }
+
         if(this->config->GetConfigValue(HocClkConfigValue_HandheldGovernor) && opMode == AppletOperationMode_Handheld) {
             
         }

@@ -201,7 +201,6 @@ void MemMtcTableAutoAdjust(EristaMtcTable *table) {
 }
 
     Result MemFreqMtcTable(u32 *ptr) {
-        if(C.eristaEmcMaxClock != EmcClkOSLimit) {
             u32 khz_list[] = {1600000, 1331200, 1065600, 800000, 665600, 408000, 204000, 102000, 68000, 40800};
             u32 khz_list_size = sizeof(khz_list) / sizeof(u32);
 
@@ -232,9 +231,6 @@ void MemMtcTableAutoAdjust(EristaMtcTable *table) {
             //}
 
             R_SUCCEED();
-        } else {
-            R_SUCCEED(); // Skip changing table on default freq
-        }
     }
 
     Result MemFreqMax(u32 *ptr) {

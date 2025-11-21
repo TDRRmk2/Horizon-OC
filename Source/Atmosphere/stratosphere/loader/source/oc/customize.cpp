@@ -32,11 +32,11 @@ volatile CustomizeTable C = {
 
 .commonCpuBoostClock = 1785000, // Default boost clock
 
-.commonEmcMemVolt  = 1175000, // LPDDR4X JEDEC Specification
+.commonEmcMemVolt  = 1125000, // LPDDR4X JEDEC Specification
 
 .eristaCpuMaxVolt  = 1235,
 
-.eristaEmcMaxClock = 1600000, // Maximum HB-MGCH ram rating
+.eristaEmcMaxClock = 1862400, // Maximum HB-MGCH ram rating
 
 .marikoCpuMaxVolt    = 1120,
 
@@ -137,7 +137,7 @@ volatile CustomizeTable C = {
     0    /* 998  (Disabled by default) */,
     0    /* 1036 (Disabled by default) */,
     0    /* 1075 (Disabled by default) */,
-};
+},
 
 
 

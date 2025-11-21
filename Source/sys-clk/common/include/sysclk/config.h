@@ -47,6 +47,9 @@ typedef enum {
     HocClkConfigValue_MarikoMaxGpuClock,
     HocClkConfigValue_MarikoMaxMemClock,
 
+    HocClkConfigValue_MarikoCpuBoostClock,
+    HocClkConfigValue_EristaCpuBoostClock,
+
     HocClkConfigValue_ThermalThrottle,
     HocClkConfigValue_ThermalThrottleThreshold,
 
@@ -56,12 +59,13 @@ typedef enum {
     HocClkConfigValue_HandheldTDP,
     HocClkConfigValue_HandheldTDPLimit,
     HocClkConfigValue_LiteTDPLimit,
-    HocClkConfigValue_TDPCycleLimit,
 
     HocClkConfigValue_EnforceBoardLimit,
 
+    HocClkConfigValue_EMCDVFS,
     HocClkConfigValue_EMCVdd2VoltageUV,
-
+    HocClkConfigValue_EMCVdd2VoltageUVStockErista,
+    HocClkConfigValue_EMCVdd2VoltageUVStockMariko,
     SysClkConfigValue_EnumMax,
 } SysClkConfigValue;
 
@@ -102,6 +106,12 @@ static inline const char* sysclkFormatConfigValue(SysClkConfigValue val, bool pr
         case HocClkConfigValue_MarikoMaxMemClock:
             return pretty ? "Max MEM Clock" : "mem_max_m";
 
+        case HocClkConfigValue_MarikoCpuBoostClock:
+            return pretty ? "CPU Boost Clock" : "cpu_boost_m";
+
+        case HocClkConfigValue_EristaCpuBoostClock:
+            return pretty ? "CPU Boost Clock" : "cpu_boost_e";
+
         case HocClkConfigValue_ThermalThrottle:
             return pretty ? "Thermal Throttle" : "thermal_throttle";
 
@@ -122,12 +132,16 @@ static inline const char* sysclkFormatConfigValue(SysClkConfigValue val, bool pr
         case HocClkConfigValue_LiteTDPLimit:
             return pretty ? "Lite TDP Limit" : "tdp_limit_l";
 
-        case HocClkConfigValue_TDPCycleLimit:
-            return pretty ? "TDP Cycle Limit" : "tdp_limit_c";
         case HocClkConfigValue_EnforceBoardLimit:
             return pretty ? "Enforce Board Limit" : "enforce_board_limit";
+        case HocClkConfigValue_EMCDVFS:
+            return pretty ? "EMC DVFS" : "emc_dvfs";
         case HocClkConfigValue_EMCVdd2VoltageUV:
-            return pretty ? "EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv";
+            return pretty ? "Overclocked EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv";
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+            return pretty ? "Stock EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv_s_e";
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
+            return pretty ? "Stock EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv_s_m";
         default:
             return pretty ? "Null" : "null";
     }
@@ -147,6 +161,7 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
         case HocClkConfigValue_OverwriteBoostMode:
             return 0ULL;
         case HocClkConfigValue_EristaMaxCpuClock:
+        case HocClkConfigValue_EristaCpuBoostClock:
             return 1785ULL;
         case HocClkConfigValue_EristaMaxGpuClock:
             return 921ULL;
@@ -154,9 +169,10 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
             return 1600ULL;
 
         case HocClkConfigValue_MarikoMaxCpuClock:
+        case HocClkConfigValue_MarikoCpuBoostClock:
             return 1963ULL;
         case HocClkConfigValue_MarikoMaxGpuClock:
-            return 1075ULL;
+            return 1152ULL;
         case HocClkConfigValue_MarikoMaxMemClock:
             return 1862ULL;
 
@@ -165,6 +181,7 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
         case HocClkConfigValue_HandheldGovernor:
         case HocClkConfigValue_HandheldTDP:
         case HocClkConfigValue_EnforceBoardLimit:
+        case HocClkConfigValue_EMCDVFS:
             return 1ULL;
         case HocClkConfigValue_ThermalThrottleThreshold:
             return 70ULL;
@@ -172,10 +189,12 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
             return 8600ULL;
         case HocClkConfigValue_LiteTDPLimit:
             return 6400ULL;
-        case HocClkConfigValue_TDPCycleLimit:
-            return 10ULL;
         case HocClkConfigValue_EMCVdd2VoltageUV:
             return 1175000ULL;
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+            return 1125000ULL;
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
+            return 1100000ULL;
         default:
             return 0ULL;
     }
@@ -191,6 +210,8 @@ static inline uint64_t sysclkValidConfigValue(SysClkConfigValue val, uint64_t in
         case HocClkConfigValue_MarikoMaxCpuClock:
         case HocClkConfigValue_MarikoMaxGpuClock:
         case HocClkConfigValue_MarikoMaxMemClock:
+        case HocClkConfigValue_EristaCpuBoostClock:
+        case HocClkConfigValue_MarikoCpuBoostClock:
         case HocClkConfigValue_ThermalThrottleThreshold:
         case HocClkConfigValue_HandheldTDPLimit:
         case HocClkConfigValue_LiteTDPLimit:
@@ -200,8 +221,9 @@ static inline uint64_t sysclkValidConfigValue(SysClkConfigValue val, uint64_t in
         case SysClkConfigValue_FreqLogIntervalMs:
         case SysClkConfigValue_PowerLogIntervalMs:
         case SysClkConfigValue_CsvWriteIntervalMs:
-        case HocClkConfigValue_TDPCycleLimit:
         case HocClkConfigValue_EMCVdd2VoltageUV:
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
             return input >= 0;
         case HocClkConfigValue_UncappedClocks:
         case HocClkConfigValue_OverwriteBoostMode:
@@ -210,6 +232,7 @@ static inline uint64_t sysclkValidConfigValue(SysClkConfigValue val, uint64_t in
         case HocClkConfigValue_HandheldGovernor:
         case HocClkConfigValue_HandheldTDP:
         case HocClkConfigValue_EnforceBoardLimit:
+        case HocClkConfigValue_EMCDVFS:
             return (input & 0x1) == input;
         default:
             return false;

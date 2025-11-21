@@ -246,14 +246,34 @@ void MiscGui::listUI()
         addFreqButton(HocClkConfigValue_EristaMaxMemClock, nullptr, SysClkModule_MEM);
     }
 
+    addConfigToggle(HocClkConfigValue_EMCDVFS, nullptr);
+
     ValueThresholds emcUvThresholds(1212500, 1250000);
     addConfigButton(
         HocClkConfigValue_EMCVdd2VoltageUV,
         "EMC VDD2 Voltage",
-        ValueRange(1100000, 1350000, 12500, "mV", 1000, 1),
+        ValueRange(1100000, 1237500, 12500, "mV", 1000, 1),
         "EMC VDD2 Voltage",
         &emcUvThresholds
     );
+
+    // if(IsMariko()) {
+    //     addConfigButton(
+    //         HocClkConfigValue_EMCVdd2VoltageUVStockMariko,
+    //         "EMC Stock VDD2 Voltage",
+    //         ValueRange(912500, 1175000, 12500, "mV", 1000, 1),
+    //         "EMC Stock VDD2 Voltage",
+    //         &emcUvThresholds
+    //     );
+    // } else {
+        addConfigButton(
+            HocClkConfigValue_EMCVdd2VoltageUVStockErista,
+            "EMC Stock VDD2 Voltage",
+            ValueRange(1000000, 1175000, 12500, "mV", 1000, 1),
+            "EMC Stock VDD2 Voltage",
+            &emcUvThresholds
+        );
+    // }
     
     tsl::elm::ListItem* applyBtn = new tsl::elm::ListItem("Apply EMC Regs");
     applyBtn->setClickListener([](u64 keys) {
