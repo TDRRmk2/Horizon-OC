@@ -24,7 +24,7 @@
 
 ---
 
-## 🌀 About
+## About
 
 **Horizon OC** is an open-source overclocking tool for Nintendo Switch consoles running **Atmosphere custom firmware**.
 It enables advanced CPU, GPU, and RAM tuning with user-friendly configuration tools.
