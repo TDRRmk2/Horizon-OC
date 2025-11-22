@@ -4,3 +4,4 @@ dist/
 .pyc
 build/
 __pycache__/
+build
