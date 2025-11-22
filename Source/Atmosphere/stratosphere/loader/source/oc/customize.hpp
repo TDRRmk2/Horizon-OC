@@ -74,7 +74,8 @@
      u32 t8_tREFI;
      u32 mem_burst_latency;
      
-     u32 marikoCpuVmin;
+     u32 marikoCpuHighVmin;
+     u32 marikoCpuLowVmin;
 
      u32 eristaGpuVmin;
      u32 marikoGpuVmin;

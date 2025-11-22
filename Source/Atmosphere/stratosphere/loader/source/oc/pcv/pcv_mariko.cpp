@@ -74,11 +74,11 @@ namespace ams::ldr::oc::pcv::mariko
             {
                 if (*(ptr - 5) == 620)
                 {
-                    PATCH_OFFSET((ptr - 5), C.marikoCpuVmin);
+                    PATCH_OFFSET((ptr - 5), C.marikoCpuHighVmin); // hf vmin
                 }
                 if (*(ptr - 1) == 620)
                 {
-                    PATCH_OFFSET((ptr - 1), 600);
+                    PATCH_OFFSET((ptr - 1), C.marikoCpuLowVmin); // lf vmin
                 }
             }
             R_SUCCEED();

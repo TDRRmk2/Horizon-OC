@@ -72,7 +72,9 @@ volatile CustomizeTable C = {
 
 .mem_burst_latency = 0, // 0 - 1600l, 1 = 1866bl, 2 = 2133bl
 
-.marikoCpuVmin = 600,
+.marikoCpuHighVmin = 710,
+
+.marikoCpuLowVmin = 600,
 
 .eristaGpuVmin = 810,
 
