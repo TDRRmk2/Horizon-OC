@@ -51,20 +51,6 @@ def populate():
             small=True,
             tag="c_freqs_info"
     )
-    dpg.add_combo(
-        items=["Disabled (0)", "Enabled (1)"],
-        default_value="Disabled (0)",
-        label="Enable CPU Unsafe Frequencies (Mariko)",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="enableMarikoCpuUnsafeFreqs"
-    )
-    dpg.add_combo(
-        items=["Disabled (0)", "Enabled (1)"],
-        default_value="Disabled (0)",
-        label="Enable CPU Unsafe Frequencies (Erista)",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="enableEristaCpuUnsafeFreqs"
-    )
 
     dpg.add_combo(
         items=freqs_mhz_cpu_label,

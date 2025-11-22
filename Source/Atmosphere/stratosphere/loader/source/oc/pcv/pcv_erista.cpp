@@ -26,21 +26,13 @@ namespace ams::ldr::oc::pcv::erista {
     Result CpuFreqVdd(u32* ptr) {
         dvfs_rail* entry = reinterpret_cast<dvfs_rail *>(reinterpret_cast<u8 *>(ptr) - offsetof(dvfs_rail, freq));
 
-        R_UNLESS(entry->id == 1,            ldr::ResultInvalidCpuFreqVddEntry());
-        R_UNLESS(entry->min_mv == 250'000,  ldr::ResultInvalidCpuFreqVddEntry());
-        R_UNLESS(entry->step_mv == 5000,    ldr::ResultInvalidCpuFreqVddEntry());
-        R_UNLESS(entry->max_mv == 1525'000, ldr::ResultInvalidCpuFreqVddEntry());
-
-        if (C.eristaCpuUV) {
-            if(!C.enableEristaCpuUnsafeFreqs) {
-                PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.eristaCpuDvfsTable)->freq);
-            } else {
-                PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.eristaCpuDvfsTableUnsafeFreqs)->freq);
-            }
-        } else {
-            PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.eristaCpuDvfsTable)->freq);
-        }
-
+    PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.eristaCpuDvfsTable)->freq);
+    R_SUCCEED();
+}
+Result GpuVmin(u32 *ptr) {
+    if (!C.eristaGpuVmin)
+        R_SKIP();
+        PATCH_OFFSET(ptr, (int)C.eristaGpuVmin);
         R_SUCCEED();
     }
 
@@ -127,14 +119,8 @@ namespace ams::ldr::oc::pcv::erista {
             max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTableSLT)->freq;
             break;
         case 2:
-            max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTableHigh)->freq;
-            break;
         case 3:
-            if(C.enableEristaGpuUnsafeFreqs) {
-                max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTableUv3UnsafeFreqs)->freq;
-            } else {
-                max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTable)->freq;
-            }
+            max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTableHigh)->freq;
             break;
         default:
             max_clock = GetDvfsTableLastEntry(C.eristaGpuDvfsTable)->freq;
@@ -732,6 +718,7 @@ namespace ams::ldr::oc::pcv::erista {
             {"CPU Volt Dfll",  &CpuVoltDfll,           1, nullptr, 0xFFEAD0FF },
             {"GPU Freq Table", GpuFreqCvbTable<false>, 1, nullptr, GpuCvbDefaultMaxFreq},
             {"GPU Freq Asm", &GpuFreqMaxAsm, 2, &GpuMaxClockPatternFn},
+            {"GPU Volt Thermal", &GpuFreqMaxAsm, 1, &GpuMaxClockPatternFn},
             {"GPU Freq PLL", &GpuFreqPllLimit, 1, nullptr, GpuClkPllLimit},
             {"MEM Freq Mtc", &MemFreqMtcTable, 0, nullptr, EmcClkOSLimit},
             {"MEM Freq Max", &MemFreqMax, 0, nullptr, EmcClkOSLimit},

@@ -94,7 +94,9 @@ namespace ams::ldr::oc::pcv
             {},
         };
 
-        constexpr u32 GpuClkPllLimit = 1300'000'000;
+        constexpr u32 GpuClkPllLimit = 2600'000;
+
+        constexpr u32 GpuClkMax = 1300'000'000;
 
         /* GPU Max Clock asm Pattern:
          *
@@ -260,21 +262,13 @@ namespace ams::ldr::oc::pcv
         cvb_entry_t *customize_table = nullptr; // impossible to reach, there will always be a way to set a pointer
 
         if (isMariko) {
-            if (C.enableMarikoCpuUnsafeFreqs) {
-                customize_table = const_cast<cvb_entry_t *>(C.marikoCpuDvfsTableUnsafeFreqs);
+            if (C.marikoCpuUV) {
+                customize_table = const_cast<cvb_entry_t *>(C.marikoCpuDvfsTableSLT);
             } else {
-                if (C.marikoCpuUV) {
-                    customize_table = const_cast<cvb_entry_t *>(C.marikoCpuDvfsTableSLT);
-                } else {
-                    customize_table = const_cast<cvb_entry_t *>(C.marikoCpuDvfsTable);
-                }
+                customize_table = const_cast<cvb_entry_t *>(C.marikoCpuDvfsTable);
             }
         } else {
-            if (C.enableEristaCpuUnsafeFreqs) {
-                customize_table = const_cast<cvb_entry_t *>(C.eristaCpuDvfsTableUnsafeFreqs);
-            } else {
                 customize_table = const_cast<cvb_entry_t *>(C.eristaCpuDvfsTable);
-            }
         }
         u32 cpu_max_volt = isMariko ? C.marikoCpuMaxVolt : C.eristaCpuMaxVolt;
         u32 cpu_freq_threshold = 1020'000;
@@ -328,14 +322,8 @@ namespace ams::ldr::oc::pcv
                 customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTableSLT);
                 break;
             case 2:
-                customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTableHiOPT);
-                break;
             case 3:
-                if(C.enableMarikoGpuUnsafeFreqs) {
-                customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTableUv3UnsafeFreqs);
-                } else {
-                    customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTable);
-                }
+                customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTableHiOPT);
                 break;
             default:
                 customize_table = const_cast<cvb_entry_t *>(C.marikoGpuDvfsTable);
@@ -350,14 +338,8 @@ namespace ams::ldr::oc::pcv
                 customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTableSLT);
                 break;
             case 2:
-                customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTableHigh);
-                break;
             case 3:
-                if(C.enableEristaGpuUnsafeFreqs) {
-                    customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTableUv3UnsafeFreqs);
-                } else {
-                    customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTable);
-                }
+                customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTableHigh);
                 break;
             default:
                 customize_table = const_cast<cvb_entry_t *>(C.eristaGpuDvfsTable);

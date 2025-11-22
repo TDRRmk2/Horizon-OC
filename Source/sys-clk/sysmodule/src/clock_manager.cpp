@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -8,6 +24,8 @@
  * --------------------------------------------------------------------------
  */
 
+#include "notification.h"
+
 #include "clock_manager.h"
 #include <cstring>
 #include "file_utils.h"
@@ -15,6 +33,12 @@
 #include "process_management.h"
 #include "errors.h"
 #include "ipc_service.h"
+
+#define HOSPPC_HAS_BOOST (hosversionAtLeast(7,0,0))
+
+bool HAS_TDP_BEEN_FIRED = false;
+bool HAS_EBL_BEEN_FIRED = false;
+bool HAS_TT_BEEN_FIRED = false;
 
 ClockManager *ClockManager::instance = NULL;
 
@@ -42,7 +66,6 @@ void ClockManager::Initialize()
 ClockManager::ClockManager()
 {
     this->config = Config::CreateDefault();
-
     this->context = new SysClkContext;
     this->context->applicationId = 0;
     this->context->profile = SysClkProfile_Handheld;
@@ -122,7 +145,16 @@ std::uint32_t ClockManager::GetMaxAllowedHz(SysClkModule module, SysClkProfile p
         {
             if (profile < SysClkProfile_HandheldCharging)
             {
-                return Board::GetSocType() == SysClkSocType_Mariko ? 614400000 : 460800000;
+                switch(Board::GetSocType()) {
+                    case SysClkSocType_Erista:
+                        return 460800000;
+                    case SysClkSocType_Mariko:
+                        return 614400000;
+                    case SysClkSocType_MarikoLite:
+                        return 537600000;
+                    default:
+                        return 4294967294;
+                }
             }
             else if (profile <= SysClkProfile_HandheldChargingUSB)
             {
@@ -201,17 +233,102 @@ void ClockManager::RefreshFreqTableRow(SysClkModule module)
 
 void ClockManager::Tick()
 {
+    
+    std::uint32_t mode = 0;
+    AppletOperationMode opMode = appletGetOperationMode();
+    Result rc = apmExtGetCurrentPerformanceConfiguration(&mode);
+    ASSERT_RESULT_OK(rc, "apmExtGetCurrentPerformanceConfiguration");
+
+
+    if(this->config->GetConfigValue(HocClkConfigValue_EMCDVFS)) { 
+
+        #define DEFAULT_FREQ_MHZ 1600
+        #define DEFAULT_FREQ_MHZ_M 1862
+
+        int ram_mhz = Board::GetHz((SysClkModule)SysClkModule_MEM) / 1000000;
+
+        if (Board::GetSocType() == SysClkSocType_Mariko) {
+            if(ram_mhz > DEFAULT_FREQ_MHZ_M)
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
+            else
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUVStockMariko));
+        } else {
+            if(ram_mhz > DEFAULT_FREQ_MHZ)
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
+            else
+                set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUVStockErista));
+        }
+    }
+
+    if(this->config->GetConfigValue(HocClkConfigValue_HandheldTDP) && opMode == AppletOperationMode_Handheld) {
+            if(Board::GetSocType() == SysClkSocType_MarikoLite) {
+                if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_LiteTDPLimit)) {
+                    if(!HAS_TDP_BEEN_FIRED)
+                        writeNotification("Horizon OC\nTDP has been activated");
+                    HAS_TDP_BEEN_FIRED = true;
+                    ResetToStockClocks();
+                    return;
+                } else {
+                    HAS_TDP_BEEN_FIRED = false;
+                }
+            } else {
+                if(Board::GetPowerMw(SysClkPowerSensor_Avg) < -(int)this->config->GetConfigValue(HocClkConfigValue_HandheldTDPLimit)) {
+                    if(!HAS_TDP_BEEN_FIRED)
+                        writeNotification("Horizon OC\nTDP has been activated");
+                    HAS_TDP_BEEN_FIRED = true;
+                    ResetToStockClocks();
+                    return;
+                } else {
+                    HAS_TDP_BEEN_FIRED = false;
+                }
+            }
+    } else if(opMode == AppletOperationMode_Console && this->config->GetConfigValue(HocClkConfigValue_EnforceBoardLimit)) {
+        if(Board::GetPowerMw(SysClkPowerSensor_Avg) < 0) {
+            if(!HAS_EBL_BEEN_FIRED)
+                writeNotification("Horizon OC\nBoard Limit has been exeeded");
+            HAS_EBL_BEEN_FIRED = true;
+            ResetToStockClocks();
+            return;
+        } else {
+            HAS_EBL_BEEN_FIRED = false;
+        }
+    }
+
+    if(this->config->GetConfigValue(HocClkConfigValue_ThermalThrottle)) {
+        if(tmp451TempSoc() / 1000 > (int)this->config->GetConfigValue(HocClkConfigValue_ThermalThrottleThreshold)) {
+            if(!HAS_TT_BEEN_FIRED)
+                writeNotification("Horizon OC\nThermal Throttle has started");
+            HAS_TT_BEEN_FIRED = true;
+            ResetToStockClocks();
+            return;
+        } else {
+            HAS_TT_BEEN_FIRED = false;
+        }
+    }
+
     std::scoped_lock lock{this->contextMutex};
     if (this->RefreshContext() || this->config->Refresh())
     {
         std::uint32_t targetHz = 0;
         std::uint32_t maxHz = 0;
         std::uint32_t nearestHz = 0;
+
+        if(apmExtIsBoostMode(mode) && !this->config->GetConfigValue(HocClkConfigValue_OverwriteBoostMode)) {
+            ResetToStockClocks();
+            return;
+        }
+
+
+        if(this->config->GetConfigValue(HocClkConfigValue_HandheldGovernor) && opMode == AppletOperationMode_Handheld) {
+            
+        }
+        if(this->config->GetConfigValue(HocClkConfigValue_DockedGovernor) && opMode == AppletOperationMode_Console) {
+            
+        }
         for (unsigned int module = 0; module < SysClkModule_EnumMax; module++)
         {
-            targetHz = this->context->overrideFreqs[module];
-//            if (!this->config->GetConfigValue(HocClkConfigValue_DockedGovernor) || !this->config->GetConfigValue(HocClkConfigValue_HandheldGovernor))
-//            {
+                targetHz = this->context->overrideFreqs[module];
+
                 if (!targetHz)
                 {
                     targetHz = this->config->GetAutoClockHz(this->context->applicationId, (SysClkModule)module, this->context->profile);
@@ -221,9 +338,7 @@ void ClockManager::Tick()
                 {
                     maxHz = this->GetMaxAllowedHz((SysClkModule)module, this->context->profile);
                     nearestHz = this->GetNearestHz((SysClkModule)module, targetHz, maxHz);
-
-                    if (nearestHz != this->context->freqs[module] && this->context->enabled/* && !apmExtIsBoostMode(this->context->perfConfId) && !this->config->GetConfigValue(HocClkConfigValue_OverwriteBoostMode)*/)
-                    {
+                    if (nearestHz != this->context->freqs[module] && this->context->enabled) {
                         FileUtils::LogLine(
                             "[mgr] %s clock set : %u.%u MHz (target = %u.%u MHz)",
                             Board::GetModuleName((SysClkModule)module, true),
@@ -232,27 +347,16 @@ void ClockManager::Tick()
 
                         Board::SetHz((SysClkModule)module, nearestHz);
                         this->context->freqs[module] = nearestHz;
-                        }
-                    // else
-                    // {
-                    //     Board::ResetToStockCpu();
-                    //     Board::ResetToStockGpu();
-                    // }
-            //     }
-            // } else {
-            //     #define GOVERNOR_LOAD_THRESHOLD 80
-            //     if(apmExtIsBoostMode(this->context->perfConfId)) {
-            //         Board::ResetToStockCpu(); // GOVERNOR: Reset to stock clocks if boost mode (dont use governor when boosted)
-            //         Board::ResetToStockGpu();
-            //     } else {
-            //         // Actually run the CPU governor
-            //         if(t210EmcLoadCpu() > GOVERNOR_LOAD_THRESHOLD) {
-            //             realHz = targetHz / 1000000
-            //         }
-            //     }
-            }
+                }
+                }
+
         }
     }
+}
+
+void ClockManager::ResetToStockClocks() {
+    Board::ResetToStockCpu();
+    Board::ResetToStockGpu();
 }
 
 void ClockManager::WaitForNextTick()
@@ -292,7 +396,7 @@ bool ClockManager::RefreshContext()
     // restore clocks to stock values on app or profile change
     if (hasChanged)
     {
-        this->rnxSync->ToggleSync(this->GetConfig()->GetConfigValue(HocClkConfigValue_SyncReverseNXMode));
+        // this->rnxSync->ToggleSync(this->GetConfig()->GetConfigValue(HocClkConfigValue_SyncReverseNXMode));
         Board::ResetToStock();
         this->WaitForNextTick();
     }
@@ -378,9 +482,9 @@ bool ClockManager::RefreshContext()
     }
 
     // ram load do not and should not force a refresh, hasChanged untouched
-    for (unsigned int loadSource = 0; loadSource < SysClkRamLoad_EnumMax; loadSource++)
+    for (unsigned int loadSource = 0; loadSource < SysClkPartLoad_EnumMax; loadSource++)
     {
-        this->context->ramLoad[loadSource] = Board::GetRamLoad((SysClkRamLoad)loadSource);
+        this->context->partLoad[loadSource] = Board::GetPartLoad((SysClkPartLoad)loadSource);
     }
 
     if (this->ConfigIntervalTimeout(SysClkConfigValue_CsvWriteIntervalMs, ns, &this->lastCsvWriteNs))
@@ -394,4 +498,50 @@ bool ClockManager::RefreshContext()
 void ClockManager::SetRNXRTMode(ReverseNXMode mode)
 {
     this->rnxSync->SetRTMode(mode);
+}
+
+void ClockManager::set_sd1_voltage(uint32_t voltage_uv)
+{
+	// SD1 parameters
+	const u32 uv_step = 12500;
+	const u32 uv_min = 600000;
+	const u32 uv_max = 1237500;
+	const u8 volt_addr = 0x17;      // MAX77620_REG_SD1
+	const u8 volt_mask = 0x7F;      // MAX77620_SD1_VOLT_MASK
+
+	if (voltage_uv < uv_min || voltage_uv > uv_max)
+		return;
+
+	u32 mult = (voltage_uv + uv_step - 1 - uv_min) / uv_step;
+	mult = mult & volt_mask;
+
+	I2cSession session;
+	Result res = i2cOpenSession(&session, I2cDevice_Max77620Pmic);
+	if (R_FAILED(res)) {
+		return;
+	}
+
+	u8 current_val = 0;
+	res = i2csessionSendAuto(&session, &volt_addr, 1, I2cTransactionOption_Start);
+	if (R_FAILED(res)) {
+        writeNotification("I2C write failed. This may be a hardware issue");
+		i2csessionClose(&session);
+		return;
+	}
+
+	res = i2csessionReceiveAuto(&session, &current_val, 1, I2cTransactionOption_Stop);
+	if (R_FAILED(res)) {
+        writeNotification("I2C write failed. This may be a hardware issue");
+		i2csessionClose(&session);
+		return;
+	}
+
+	// Mask in the new voltage bits, preserving other bits
+	u8 new_val = (current_val & ~volt_mask) | mult;
+
+	// Write back register with START and STOP conditions
+	u8 write_buf[2] = {volt_addr, new_val};
+	res = i2csessionSendAuto(&session, write_buf, sizeof(write_buf), I2cTransactionOption_All);
+
+	i2csessionClose(&session);
 }

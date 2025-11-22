@@ -28,10 +28,6 @@ private:
         uint32_t marikoGpuUV;
         uint32_t eristaCpuUV;
         uint32_t eristaGpuUV;
-        uint32_t enableMarikoGpuUnsafeFreqs;
-        uint32_t enableEristaGpuUnsafeFreqs;
-        uint32_t enableMarikoCpuUnsafeFreqs;
-        uint32_t enableEristaCpuUnsafeFreqs;
         uint32_t commonGpuVoltOffset;
         uint32_t marikoEmcDvbShift;
         

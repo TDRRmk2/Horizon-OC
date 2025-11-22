@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -7,6 +23,7 @@
  * stuff is worth it, you can buy us a beer in return.  - The sys-clk authors
  * --------------------------------------------------------------------------
  */
+
 
 #pragma once
 
@@ -19,11 +36,36 @@ typedef enum {
     SysClkConfigValue_FreqLogIntervalMs,
     SysClkConfigValue_PowerLogIntervalMs,
     SysClkConfigValue_CsvWriteIntervalMs,
+
     HocClkConfigValue_UncappedClocks,
     HocClkConfigValue_OverwriteBoostMode,
-    HocClkConfigValue_SyncReverseNXMode,
-    HocClkConfigValue_DockedGovernor,
+
+    HocClkConfigValue_EristaMaxCpuClock,
+    HocClkConfigValue_EristaMaxGpuClock,
+    HocClkConfigValue_EristaMaxMemClock,
+    HocClkConfigValue_MarikoMaxCpuClock,
+    HocClkConfigValue_MarikoMaxGpuClock,
+    HocClkConfigValue_MarikoMaxMemClock,
+
+    HocClkConfigValue_MarikoCpuBoostClock,
+    HocClkConfigValue_EristaCpuBoostClock,
+
+    HocClkConfigValue_ThermalThrottle,
+    HocClkConfigValue_ThermalThrottleThreshold,
+
     HocClkConfigValue_HandheldGovernor,
+    HocClkConfigValue_DockedGovernor,
+
+    HocClkConfigValue_HandheldTDP,
+    HocClkConfigValue_HandheldTDPLimit,
+    HocClkConfigValue_LiteTDPLimit,
+
+    HocClkConfigValue_EnforceBoardLimit,
+
+    HocClkConfigValue_EMCDVFS,
+    HocClkConfigValue_EMCVdd2VoltageUV,
+    HocClkConfigValue_EMCVdd2VoltageUVStockErista,
+    HocClkConfigValue_EMCVdd2VoltageUVStockMariko,
     SysClkConfigValue_EnumMax,
 } SysClkConfigValue;
 
@@ -49,14 +91,59 @@ static inline const char* sysclkFormatConfigValue(SysClkConfigValue val, bool pr
             return pretty ? "Uncapped Clocks" : "uncapped_clocks";
         case HocClkConfigValue_OverwriteBoostMode:
             return pretty ? "Overwrite Boost Mode" : "ow_boost";
-        case HocClkConfigValue_SyncReverseNXMode:
-            return pretty ? "ReverseNX Sync" : "rnx_sync";
+
+        case HocClkConfigValue_EristaMaxCpuClock:
+            return pretty ? "Max CPU Clock" : "cpu_max_e";
+        case HocClkConfigValue_EristaMaxGpuClock:
+            return pretty ? "Max GPU Clock" : "gpu_max_e";
+        case HocClkConfigValue_EristaMaxMemClock:
+            return pretty ? "Max MEM Clock" : "mem_max_e";
+
+        case HocClkConfigValue_MarikoMaxCpuClock:
+            return pretty ? "Max CPU Clock" : "cpu_max_m";
+        case HocClkConfigValue_MarikoMaxGpuClock:
+            return pretty ? "Max GPU Clock" : "gpu_max_m";
+        case HocClkConfigValue_MarikoMaxMemClock:
+            return pretty ? "Max MEM Clock" : "mem_max_m";
+
+        case HocClkConfigValue_MarikoCpuBoostClock:
+            return pretty ? "CPU Boost Clock" : "cpu_boost_m";
+
+        case HocClkConfigValue_EristaCpuBoostClock:
+            return pretty ? "CPU Boost Clock" : "cpu_boost_e";
+
+        case HocClkConfigValue_ThermalThrottle:
+            return pretty ? "Thermal Throttle" : "thermal_throttle";
+
+        case HocClkConfigValue_ThermalThrottleThreshold:
+            return pretty ? "Thermal Throttle Threshold" : "thermal_throttle_threshold";
+
         case HocClkConfigValue_DockedGovernor:
-            return pretty ? "Docked Governor" : "governor_d";
+            return pretty ? "Docked Governor" : "governor_docked";
         case HocClkConfigValue_HandheldGovernor:
-            return pretty ? "Handheld Governor" : "governor_hh";
+            return pretty ? "Handheld Governor" : "governor_handheld";
+
+        case HocClkConfigValue_HandheldTDP:
+            return pretty ? "Handheld TDP" : "handheld_tdp";
+
+        case HocClkConfigValue_HandheldTDPLimit:
+            return pretty ? "TDP Limit" : "tdp_limit";
+
+        case HocClkConfigValue_LiteTDPLimit:
+            return pretty ? "Lite TDP Limit" : "tdp_limit_l";
+
+        case HocClkConfigValue_EnforceBoardLimit:
+            return pretty ? "Enforce Board Limit" : "enforce_board_limit";
+        case HocClkConfigValue_EMCDVFS:
+            return pretty ? "EMC DVFS" : "emc_dvfs";
+        case HocClkConfigValue_EMCVdd2VoltageUV:
+            return pretty ? "Overclocked EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv";
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+            return pretty ? "Stock EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv_s_e";
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
+            return pretty ? "Stock EMC Vdd2 Voltage" : "emc_vdd2_voltage_uv_s_m";
         default:
-            return NULL;
+            return pretty ? "Null" : "null";
     }
 }
 
@@ -72,8 +159,42 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
         case SysClkConfigValue_CsvWriteIntervalMs:
         case HocClkConfigValue_UncappedClocks:
         case HocClkConfigValue_OverwriteBoostMode:
-        case HocClkConfigValue_SyncReverseNXMode:
             return 0ULL;
+        case HocClkConfigValue_EristaMaxCpuClock:
+        case HocClkConfigValue_EristaCpuBoostClock:
+            return 1785ULL;
+        case HocClkConfigValue_EristaMaxGpuClock:
+            return 921ULL;
+        case HocClkConfigValue_EristaMaxMemClock:
+            return 1600ULL;
+
+        case HocClkConfigValue_MarikoMaxCpuClock:
+        case HocClkConfigValue_MarikoCpuBoostClock:
+            return 1963ULL;
+        case HocClkConfigValue_MarikoMaxGpuClock:
+            return 1152ULL;
+        case HocClkConfigValue_MarikoMaxMemClock:
+            return 1862ULL;
+
+        case HocClkConfigValue_ThermalThrottle:
+        case HocClkConfigValue_DockedGovernor:
+        case HocClkConfigValue_HandheldGovernor:
+        case HocClkConfigValue_HandheldTDP:
+        case HocClkConfigValue_EnforceBoardLimit:
+        case HocClkConfigValue_EMCDVFS:
+            return 1ULL;
+        case HocClkConfigValue_ThermalThrottleThreshold:
+            return 70ULL;
+        case HocClkConfigValue_HandheldTDPLimit:
+            return 8600ULL;
+        case HocClkConfigValue_LiteTDPLimit:
+            return 6400ULL;
+        case HocClkConfigValue_EMCVdd2VoltageUV:
+            return 1175000ULL;
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+            return 1125000ULL;
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
+            return 1100000ULL;
         default:
             return 0ULL;
     }
@@ -83,16 +204,35 @@ static inline uint64_t sysclkValidConfigValue(SysClkConfigValue val, uint64_t in
 {
     switch(val)
     {
+        case HocClkConfigValue_EristaMaxCpuClock:
+        case HocClkConfigValue_EristaMaxGpuClock:
+        case HocClkConfigValue_EristaMaxMemClock:
+        case HocClkConfigValue_MarikoMaxCpuClock:
+        case HocClkConfigValue_MarikoMaxGpuClock:
+        case HocClkConfigValue_MarikoMaxMemClock:
+        case HocClkConfigValue_EristaCpuBoostClock:
+        case HocClkConfigValue_MarikoCpuBoostClock:
+        case HocClkConfigValue_ThermalThrottleThreshold:
+        case HocClkConfigValue_HandheldTDPLimit:
+        case HocClkConfigValue_LiteTDPLimit:
         case SysClkConfigValue_PollingIntervalMs:
             return input > 0;
         case SysClkConfigValue_TempLogIntervalMs:
         case SysClkConfigValue_FreqLogIntervalMs:
         case SysClkConfigValue_PowerLogIntervalMs:
         case SysClkConfigValue_CsvWriteIntervalMs:
+        case HocClkConfigValue_EMCVdd2VoltageUV:
+        case HocClkConfigValue_EMCVdd2VoltageUVStockErista:
+        case HocClkConfigValue_EMCVdd2VoltageUVStockMariko:
             return input >= 0;
-        case HocClkConfigValue_OverwriteBoostMode:
         case HocClkConfigValue_UncappedClocks:
-        case HocClkConfigValue_SyncReverseNXMode:
+        case HocClkConfigValue_OverwriteBoostMode:
+        case HocClkConfigValue_ThermalThrottle:
+        case HocClkConfigValue_DockedGovernor:
+        case HocClkConfigValue_HandheldGovernor:
+        case HocClkConfigValue_HandheldTDP:
+        case HocClkConfigValue_EnforceBoardLimit:
+        case HocClkConfigValue_EMCDVFS:
             return (input & 0x1) == input;
         default:
             return false;

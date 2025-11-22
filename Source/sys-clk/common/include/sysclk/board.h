@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -7,6 +23,7 @@
  * stuff is worth it, you can buy us a beer in return.  - The sys-clk authors
  * --------------------------------------------------------------------------
  */
+
 
 #pragma once
 
@@ -18,6 +35,7 @@ typedef enum
 {
     SysClkSocType_Erista = 0,
     SysClkSocType_Mariko,
+    SysClkSocType_MarikoLite,
     SysClkSocType_EnumMax
 } SysClkSocType;
 
@@ -36,7 +54,7 @@ typedef enum
     SysClkModule_CPU = 0,
     SysClkModule_GPU,
     SysClkModule_MEM,
-    SysClkModule_EnumMax
+    SysClkModule_EnumMax,
 } SysClkModule;
 
 typedef enum
@@ -56,10 +74,11 @@ typedef enum
 
 typedef enum
 {
-    SysClkRamLoad_All = 0,
-    SysClkRamLoad_Cpu,
-    SysClkRamLoad_EnumMax
-} SysClkRamLoad;
+    SysClkPartLoad_EMC = 0,
+    SysClkPartLoad_EMCCpu,
+    HocClkPartLoad_GPU,
+    SysClkPartLoad_EnumMax
+} SysClkPartLoad;
 
 typedef enum
 {

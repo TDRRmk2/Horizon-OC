@@ -25,10 +25,6 @@ public:
         data.marikoGpuUV = 0;
         data.eristaCpuUV = 0;
         data.eristaGpuUV = 0;
-        data.enableMarikoGpuUnsafeFreqs = 0;
-        data.enableEristaGpuUnsafeFreqs = 0;
-        data.enableMarikoCpuUnsafeFreqs = 0;
-        data.enableEristaCpuUnsafeFreqs = 0;
         data.commonGpuVoltOffset = 0;
         data.marikoEmcDvbShift = 0;
         

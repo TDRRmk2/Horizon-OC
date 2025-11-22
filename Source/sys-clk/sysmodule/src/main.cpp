@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -7,6 +23,7 @@
  * stuff is worth it, you can buy us a beer in return.  - The sys-clk authors
  * --------------------------------------------------------------------------
  */
+
 
 #include <cstdlib>
 #include <cstring>
@@ -21,7 +38,9 @@
 #include "clock_manager.h"
 #include "ipc_service.h"
 #include "fancontrol.h"
-#define INNER_HEAP_SIZE 0x30000
+#include "emc_patcher.h"
+
+#define INNER_HEAP_SIZE 0x50000
 
 extern "C"
 {
@@ -49,12 +68,22 @@ extern "C"
 
     void __appInit(void)
     {
+        Result rc;
         if (R_FAILED(smInitialize()))
         {
             fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
         }
 
-        Result rc = setsysInitialize();
+        rc = fanInitialize();
+        if (R_FAILED(rc))
+            diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
+    
+        rc = i2cInitialize();
+        if (R_FAILED(rc))
+            diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
+
+
+        rc = setsysInitialize();
         if (R_SUCCEEDED(rc))
         {
             SetSysFirmwareVersion fw;
@@ -63,14 +92,7 @@ extern "C"
                 hosversionSet(MAKEHOSVERSION(fw.major, fw.minor, fw.micro));
             setsysExit();
         }
-        
-        rc = fanInitialize();
-        if (R_FAILED(rc))
-            diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
-    
-        rc = i2cInitialize();
-        if (R_FAILED(rc))
-            diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
+
     }
 
     void __appExit(void)
@@ -79,7 +101,8 @@ extern "C"
         fanExit();
         i2cExit();
         fsExit();
-        fsdevUnmountAll();    
+        fsdevUnmountAll();   
+        smExit();
         }
 }
 
@@ -102,7 +125,7 @@ int main(int argc, char** argv)
         ClockManager* clockMgr = new ClockManager();
         IpcService* ipcSrv = new IpcService(clockMgr);
 
-        FileUtils::LogLine("Ready");
+        FileUtils::LogLine("Starting Horizon OC Sysmodule");
 
         clockMgr->SetRunning(true);
         clockMgr->GetConfig()->SetEnabled(true);

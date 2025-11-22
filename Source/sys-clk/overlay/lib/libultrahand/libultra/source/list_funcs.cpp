@@ -21,6 +21,8 @@
 #include <mutex>
 
 namespace ult {
+    static constexpr const char* UNABLE_TO_OPEN_FILE = "Unable to open file: ";
+
     // Thread-safe file access mutex
     static std::mutex file_access_mutex;
     
@@ -92,7 +94,7 @@ namespace ult {
         FILE* file = fopen(filePath.c_str(), "r");
         if (!file) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return lines;
         }
@@ -126,7 +128,7 @@ namespace ult {
         std::ifstream file(filePath);
         if (!file.is_open()) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return lines;
         }
@@ -161,7 +163,7 @@ namespace ult {
         FILE* file = fopen(listPath.c_str(), "r");
         if (!file) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + listPath);
+            logMessage(UNABLE_TO_OPEN_FILE + listPath);
             #endif
             return "";
         }
@@ -200,7 +202,7 @@ namespace ult {
         std::ifstream file(listPath);
         if (!file.is_open()) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + listPath);
+            logMessage(UNABLE_TO_OPEN_FILE + listPath);
             #endif
             return "";
         }
@@ -288,7 +290,7 @@ namespace ult {
         FILE* file = fopen(filePath.c_str(), "r");
         if (!file) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return lines;
         }
@@ -310,7 +312,7 @@ namespace ult {
         std::ifstream file(filePath);
         if (!file.is_open()) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return lines;
         }
@@ -335,7 +337,7 @@ namespace ult {
         FILE* file = fopen(filePath.c_str(), "w");
         if (!file) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Failed to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return;
         }
@@ -349,7 +351,7 @@ namespace ult {
         std::ofstream file(filePath);
         if (!file.is_open()) {
             #if USING_LOGGING_DIRECTIVE
-            logMessage("Failed to open file: " + filePath);
+            logMessage(UNABLE_TO_OPEN_FILE + filePath);
             #endif
             return;
         }
@@ -362,106 +364,151 @@ namespace ult {
     #endif
     }
 
+    // Helper function for streaming comparison
+    void streamCompareAndWrite(const std::string& streamFilePath, 
+                              const std::unordered_set<std::string>& compareSet, 
+                              const std::string& outputTxtFilePath) {
+        std::lock_guard<std::mutex> lock(file_access_mutex);
+        
+    #if !USING_FSTREAM_DIRECTIVE
+        FILE* streamFile = fopen(streamFilePath.c_str(), "r");
+        if (!streamFile) return;
+        
+        FILE* outputFile = fopen(outputTxtFilePath.c_str(), "w");
+        if (!outputFile) {
+            fclose(streamFile);
+            return;
+        }
+        
+        static constexpr size_t BUFFER_SIZE = 8192;
+        char buffer[BUFFER_SIZE];
+        size_t len;
+        
+        while (fgets(buffer, BUFFER_SIZE, streamFile)) {
+            len = strlen(buffer);
+            if (len > 0 && buffer[len - 1] == '\n') {
+                buffer[len - 1] = '\0';
+            }
+            
+            if (compareSet.count(std::string(buffer))) {
+                fprintf(outputFile, "%s\n", buffer);
+            }
+        }
+        
+        fclose(streamFile);
+        fclose(outputFile);
+        
+    #else
+        std::ifstream streamFile(streamFilePath);
+        if (!streamFile.is_open()) return;
+        
+        std::ofstream outputFile(outputTxtFilePath);
+        if (!outputFile.is_open()) return;
+        
+        std::string line;
+        while (std::getline(streamFile, line)) {
+            if (compareSet.count(line)) {
+                outputFile << line << '\n';
+            }
+        }
+    #endif
+    }
     
     // Function to compare two file lists and save duplicates to an output file
     void compareFilesLists(const std::string& txtFilePath1, const std::string& txtFilePath2, const std::string& outputTxtFilePath) {
         // Read files into sets
         std::unordered_set<std::string> fileSet1 = readSetFromFile(txtFilePath1);
         std::unordered_set<std::string> fileSet2 = readSetFromFile(txtFilePath2);
-        std::unordered_set<std::string> duplicateFiles;
-    
-        // Find intersection (common elements) between the two sets
-        for (const auto& entry : fileSet1) {
-            if (fileSet2.count(entry)) {
-                duplicateFiles.insert(entry);
+        
+        // Always work with the smaller set for better performance
+        if (fileSet1.size() <= fileSet2.size()) {
+            // fileSet1 is smaller or equal - modify it
+            for (auto it = fileSet1.begin(); it != fileSet1.end();) {
+                if (fileSet2.count(*it) == 0) {
+                    it = fileSet1.erase(it);
+                } else {
+                    ++it;
+                }
             }
-        }
-    
-        // Write the duplicates to the output file
-        writeSetToFile(duplicateFiles, outputTxtFilePath);
-    }
-    
-    // Helper function to read a text file and process each line with a callback
-    void processFileLines(const std::string& filePath, const std::function<void(const std::string&)>& callback) {
-        std::lock_guard<std::mutex> lock(file_access_mutex);
-        
-    #if !USING_FSTREAM_DIRECTIVE
-        FILE* file = fopen(filePath.c_str(), "r");
-        if (!file) {
-            #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
-            #endif
-            return;
-        }
-    
-        // OPTIMIZATION 1: Larger buffer for better I/O performance
-        static constexpr size_t BUFFER_SIZE = 8192;
-        char buffer[BUFFER_SIZE];
-        
-        while (fgets(buffer, BUFFER_SIZE, file)) {
-            // OPTIMIZATION 2: Find newline directly instead of strlen()
-            char* newlinePos = strchr(buffer, '\n');
-            if (newlinePos) {
-                *newlinePos = '\0';  // Remove newline in-place
+            writeSetToFile(fileSet1, outputTxtFilePath);
+        } else {
+            // fileSet2 is smaller - modify it instead
+            for (auto it = fileSet2.begin(); it != fileSet2.end();) {
+                if (fileSet1.count(*it) == 0) {
+                    it = fileSet2.erase(it);
+                } else {
+                    ++it;
+                }
             }
-            
-            // OPTIMIZATION 3: Pass buffer directly - no string construction overhead
-            callback(std::string(buffer));
+            writeSetToFile(fileSet2, outputTxtFilePath);
         }
-    
-        fclose(file);
-        
-    #else
-        // OPTIMIZATION 4: Use faster I/O for fstream version
-        std::ifstream file(filePath);
-        if (!file.is_open()) {
-            #if USING_LOGGING_DIRECTIVE
-            logMessage("Unable to open file: " + filePath);
-            #endif
-            return;
-        }
-        
-        // OPTIMIZATION 5: Reserve string capacity to avoid reallocations
-        std::string line;
-        line.reserve(256);  // Reasonable default for most lines
-        
-        while (std::getline(file, line)) {
-            callback(line);
-        }
-    #endif
     }
-
     
     void compareWildcardFilesLists(
         const std::string& wildcardPatternFilePath,
         const std::string& txtFilePath,
         const std::string& outputTxtFilePath
     ) {
-        // STEP 1: Read target file into fast lookup set (only once)
-        const std::unordered_set<std::string> targetLines = readSetFromFile(txtFilePath);
+        std::unordered_set<std::string> targetLines = readSetFromFile(txtFilePath);
         std::unordered_set<std::string> duplicates;
         
-        // STEP 2: Get wildcard files
-        std::vector<std::string> wildcardFiles = getFilesListByWildcards(wildcardPatternFilePath);
+        auto wildcardFiles = getFilesListByWildcards(wildcardPatternFilePath);
         
-        // STEP 3: Process each wildcard file line-by-line (minimum memory)
+        static constexpr size_t BUFFER_SIZE = 8192;
+
         for (auto& filePath : wildcardFiles) {
-            if (filePath == txtFilePath) {
-                filePath = "";
+            if (filePath == txtFilePath || targetLines.empty()) {
+                filePath = "";  // Clear early
+                continue; 
+            }
+            
+            std::lock_guard<std::mutex> lock(file_access_mutex);
+            
+    #if !USING_FSTREAM_DIRECTIVE
+            FILE* file = fopen(filePath.c_str(), "r");
+            if (!file) {
+                #if USING_LOGGING_DIRECTIVE
+                logMessage(UNABLE_TO_OPEN_FILE + filePath);
+                #endif
                 continue;
             }
-
-            // Process line-by-line without loading entire file into memory
-            processFileLines(filePath, [&](const std::string& line) {
-                // O(1) lookup + O(1) insert if duplicate found
-                if (targetLines.count(line)) {
-                    duplicates.insert(line);
+    
+            
+            char buffer[BUFFER_SIZE];
+            
+            while (fgets(buffer, BUFFER_SIZE, file) && !targetLines.empty()) { // Early exit!
+                char* newlinePos = strchr(buffer, '\n');
+                if (newlinePos) *newlinePos = '\0';
+                
+                auto it = targetLines.find(std::string(buffer));
+                if (it != targetLines.end()) {
+                    duplicates.emplace(std::move(*it)); // Move instead of copy
+                    targetLines.erase(it);
                 }
-            });
-            filePath = "";
+            }
+            fclose(file);
+            
+    #else
+            std::ifstream file(filePath);
+            if (!file.is_open()) {
+                #if USING_LOGGING_DIRECTIVE
+                logMessage(UNABLE_TO_OPEN_FILE + filePath);
+                #endif
+                continue;
+            }
+            
+            std::string line;
+            while (std::getline(file, line) && !targetLines.empty()) { // Early exit!
+                auto it = targetLines.find(line);
+                if (it != targetLines.end()) {
+                    duplicates.emplace(std::move(*it)); // Move instead of copy
+                    targetLines.erase(it);
+                }
+            }
+    #endif
+            filePath = "";  // Clear after processing - reduces vector memory footprint
         }
         
-        // STEP 4: Write results
         writeSetToFile(duplicates, outputTxtFilePath);
     }
 }

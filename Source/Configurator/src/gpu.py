@@ -85,20 +85,6 @@ def populate():
             tag="freqs_info"
     )
     dpg.add_checkbox(label="GPU Scheduling", default_value=True, tag="gpu_sched", callback=toggle_gpu_sched)
-    dpg.add_combo(
-        items=["Disabled (0)", "Enabled (1)"],
-        default_value="Disabled (0)",
-        label="Enable GPU Unsafe Frequencies (Mariko)",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="enableMarikoGpuUnsafeFreqs"
-    )
-    dpg.add_combo(
-        items=["Disabled (0)", "Enabled (1)"],
-        default_value="Disabled (0)",
-        label="Enable GPU Unsafe Frequencies (Erista)",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="enableEristaGpuUnsafeFreqs"
-    )
 
     dpg.add_separator(label="Voltages")
 

@@ -87,11 +87,11 @@ AppProfilesTab::AppProfilesTab()
         }
 
         // Name
-        if (!langEntry->name)
-        {
-            i++;
-            continue;
-        }
+        // if (!langEntry->name)
+        // {
+        //     i++;
+        //     continue;
+        // }
 
         Title* title = (Title*) malloc(sizeof(Title));
         title->tid = tid;

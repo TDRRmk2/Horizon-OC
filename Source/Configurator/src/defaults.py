@@ -36,10 +36,6 @@ class Defaults: # This almost always never needs to be updated as pulling from t
         self.marikoGpuUV = 0
         self.eristaCpuUV = 0
         self.eristaGpuUV = 0
-        self.enableMarikoGpuUnsafeFreqs = 0
-        self.enableEristaGpuUnsafeFreqs = 0
-        self.enableMarikoCpuUnsafeFreqs = 0
-        self.enableEristaCpuUnsafeFreqs = 0
         self.commonGpuVoltOffset = 0
         self.marikoEmcDvbShift = 0
         self.t1_tRCD = 0

@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -8,12 +24,17 @@
  * --------------------------------------------------------------------------
  */
 
+
 #include <nxExt.h>
 #include "board.h"
 #include "errors.h"
 
 #define HOSSVC_HAS_CLKRST (hosversionAtLeast(8,0,0))
 #define HOSSVC_HAS_TC (hosversionAtLeast(5,0,0))
+#define NVGPU_GPU_IOCTL_PMU_GET_GPU_LOAD 0x80044715
+
+Result nvCheck = 1;
+u32 fd = 0;
 
 static SysClkSocType g_socType = SysClkSocType_Erista;
 
@@ -100,6 +121,11 @@ void Board::Initialize()
     rc = tmp451Initialize();
     ASSERT_RESULT_OK(rc, "tmp451Initialize");
 
+    // u32 fd = 0;
+
+    // if (R_SUCCEEDED(nvInitialize())) nvCheck = nvOpen(&fd, "/dev/nvhost-ctrl-gpu");
+
+
     FetchHardwareInfos();
 }
 
@@ -124,6 +150,7 @@ void Board::Exit()
 
     max17050Exit();
     tmp451Exit();
+    nvExit();
 }
 
 SysClkProfile Board::GetProfile()
@@ -446,16 +473,23 @@ std::int32_t Board::GetPowerMw(SysClkPowerSensor sensor)
     return 0;
 }
 
-std::uint32_t Board::GetRamLoad(SysClkRamLoad loadSource)
+std::uint32_t Board::GetPartLoad(SysClkPartLoad loadSource)
 {
+    // u32 temp, GPU_Load_u = 0;
+
     switch(loadSource)
     {
-        case SysClkRamLoad_All:
+        case SysClkPartLoad_EMC:
             return t210EmcLoadAll();
-        case SysClkRamLoad_Cpu:
+        case SysClkPartLoad_EMCCpu:
             return t210EmcLoadCpu();
+        // case HocClkPartLoad_GPU:
+        // 	#define gpu_samples_average 10
+        //     // nvIoctl(fd, NVGPU_GPU_IOCTL_PMU_GET_GPU_LOAD, &temp);
+        //     GPU_Load_u = ((GPU_Load_u * (gpu_samples_average-1)) + temp) / gpu_samples_average;
+        //     return GPU_Load_u / 10;
         default:
-            ASSERT_ENUM_VALID(SysClkRamLoad, loadSource);
+            ASSERT_ENUM_VALID(SysClkPartLoad, loadSource);
     }
 
     return 0;
@@ -464,6 +498,7 @@ std::uint32_t Board::GetRamLoad(SysClkRamLoad loadSource)
 SysClkSocType Board::GetSocType() {
     return g_socType;
 }
+
 
 void Board::FetchHardwareInfos()
 {

@@ -60,11 +60,6 @@
      u32 eristaCpuUV;
      u32 eristaGpuUV;
 
-     u32 enableMarikoGpuUnsafeFreqs;
-     u32 enableEristaGpuUnsafeFreqs;
-
-     u32 enableMarikoCpuUnsafeFreqs;
-     u32 enableEristaCpuUnsafeFreqs;
 
      u32 commonGpuVoltOffset;
 
@@ -88,7 +83,7 @@
      u32 marikoGpuVmax;
 
      u32 marikoGpuVoltArray[24];
-     u32 eristaGpuVoltArray[14];
+     u32 eristaGpuVoltArray[27];
 
      CustomizeCpuDvfsTable eristaCpuDvfsTable;
      CustomizeCpuDvfsTable marikoCpuDvfsTable;
@@ -104,11 +99,6 @@
      CustomizeGpuDvfsTable marikoGpuDvfsTableHiOPT;
      //EristaMtcTable* eristaMtcTable;
      //MarikoMtcTable* marikoMtcTable;
-     CustomizeGpuDvfsTable eristaGpuDvfsTableUv3UnsafeFreqs;
-     CustomizeGpuDvfsTable marikoGpuDvfsTableUv3UnsafeFreqs;
-     CustomizeCpuDvfsTable marikoCpuDvfsTableUnsafeFreqs;
-     CustomizeCpuDvfsTable eristaCpuDvfsTableUnsafeFreqs;
-
  } CustomizeTable;
  //static_assert(sizeof(CustomizeTable) == sizeof(u8) * 4 + sizeof(u32) * 10 + sizeof(CustomizeCpuDvfsTable) * 5 + sizeof(void*) * 2);
  //static_assert(sizeof(CustomizeTable) == 7000);

@@ -60,6 +60,7 @@ freqs_mhz_cpu = [
 variables = [
     ("custRev", "u32"),
     ("mtcConf", "u32"),
+    ("hpMode", "u32"),
     ("commonCpuBoostClock", "u32"),
     ("commonEmcMemVolt", "u32"),
     ("eristaCpuMaxVolt", "u32"),
@@ -71,10 +72,6 @@ variables = [
     ("marikoGpuUV", "u32"),
     ("eristaCpuUV", "u32"),
     ("eristaGpuUV", "u32"),
-    ("enableMarikoGpuUnsafeFreqs", "u32"),
-    ("enableEristaGpuUnsafeFreqs", "u32"),
-    ("enableMarikoCpuUnsafeFreqs", "u32"),
-    ("enableEristaCpuUnsafeFreqs", "u32"),
     ("commonGpuVoltOffset", "u32"),
     ("marikoEmcDvbShift", "u32"),
     # advanced config
@@ -156,10 +153,6 @@ def load_all_vars():
     c.load_entry_object("marikoGpuUV", 4)
     c.load_entry_object("eristaCpuUV", 5)
     c.load_entry_object("eristaGpuUV", 4)
-    c.load_entry_object("enableMarikoGpuUnsafeFreqs", 0)
-    c.load_entry_object("enableEristaGpuUnsafeFreqs", 0)
-    c.load_entry_object("enableMarikoCpuUnsafeFreqs", 0)
-    c.load_entry_object("enableEristaCpuUnsafeFreqs", 0)
     c.load_entry_object("commonGpuVoltOffset", 3)
     c.load_entry_object("marikoEmcDvbShift", 0)
 

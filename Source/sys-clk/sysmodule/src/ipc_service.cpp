@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -8,12 +24,15 @@
  * --------------------------------------------------------------------------
  */
 
+
 #include "ipc_service.h"
 #include <cstring>
 #include <switch.h>
 #include "file_utils.h"
 #include "errors.h"
 #include "clock_manager.h"
+#include "emc_patcher.h"
+
 IpcService::IpcService(ClockManager* clockMgr)
 {
     std::int32_t priority;
@@ -145,7 +164,7 @@ Result IpcService::ServiceHandlerFunc(void* arg, const IpcServerRequest* r, u8* 
             break;
 
         case SysClkIpcCmd_GetConfigValues:
-            *out_dataSize = sizeof(SysClkTitleProfileList);
+            *out_dataSize = sizeof(SysClkConfigValueList); // bug in stock sys-clk. really stupid bug :skull:
             return ipcSrv->GetConfigValues((SysClkConfigValueList*)out_data);
 
         case SysClkIpcCmd_SetConfigValues:
@@ -171,6 +190,9 @@ Result IpcService::ServiceHandlerFunc(void* arg, const IpcServerRequest* r, u8* 
                 ReverseNXMode mode = *((ReverseNXMode*)r->data.ptr);
                 return ipcSrv->SetReverseNXRTMode(mode);
             }
+            break;
+        case HocClkIpcCmd_UpdateEMCRegs: // Trigger, not data
+            return ipcSrv->PatchEmcRegs();
             break;
     }
 
@@ -207,6 +229,7 @@ Result IpcService::Exit()
 
     return 0;
 }
+
 
 Result IpcService::GetProfileCount(std::uint64_t* tid, std::uint8_t* out_count)
 {
@@ -246,7 +269,7 @@ Result IpcService::SetProfiles(SysClkIpc_SetProfiles_Args* args)
 
     if(!config->SetProfiles(args->tid, &profiles, true))
     {
-        return SYSCLK_ERROR(ConfigSaveFailed);
+        return SYSCLK_ERROR(ConfigSaveFailed); // 0x584
     }
 
     return 0;
@@ -326,5 +349,11 @@ Result IpcService::GetFreqList(SysClkIpc_GetFreqList_Args* args, std::uint32_t* 
 
 Result IpcService::SetReverseNXRTMode(ReverseNXMode mode) {
     ClockManager::GetInstance()->SetRNXRTMode(mode);
+    return 0;
+}
+
+
+Result IpcService::PatchEmcRegs() {
+    EMCpatcher::GetInstance()->Run();
     return 0;
 }

@@ -125,6 +125,8 @@ namespace ult {
 
     bool consoleIsDocked();
     
+    std::string getBuildIdAsString();
+
     std::string getTitleIdAsString();
     
     extern std::string lastTitleID;
@@ -138,6 +140,8 @@ namespace ult {
     extern bool useSwipeToOpen;
     extern bool useLaunchCombos;
     extern bool useNotifications;
+    extern bool useSoundEffects;
+    extern bool useHapticFeedback;
     extern bool usePageSwap;
     extern std::atomic<bool> noClickableItems;
 
@@ -306,6 +310,7 @@ namespace ult {
     
     extern const std::string whiteColor;
     extern const std::string blackColor;
+    extern const std::string greyColor;
 
     extern std::atomic<bool> languageWasChanged;
     
@@ -405,6 +410,8 @@ namespace ult {
 
     extern std::string LAUNCH_COMBOS;
     extern std::string NOTIFICATIONS;
+    extern std::string SOUND_EFFECTS;
+    extern std::string HAPTIC_FEEDBACK;
     extern std::string OPAQUE_SCREENSHOTS;
 
     extern std::string PACKAGE_INFO;
@@ -563,7 +570,7 @@ namespace ult {
     float calculateAmplitude(float x, float peakDurationFactor = 0.25f);
             
     
-    
+    extern std::atomic<bool> refreshWallpaperNow;
     extern std::atomic<bool> refreshWallpaper;
     extern std::vector<u8> wallpaperData;
     extern std::atomic<bool> inPlot;

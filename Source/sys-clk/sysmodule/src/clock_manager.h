@@ -1,5 +1,21 @@
 /*
- * --------------------------------------------------------------------------
+ * Copyright (c) Souldbminer and Horizon OC Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+ 
+/* --------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <p-sam@d3vs.net>, <natinusala@gmail.com>, <m4x@m4xw.net>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -8,10 +24,12 @@
  * --------------------------------------------------------------------------
  */
 
+
 #pragma once
 
 #include <atomic>
 #include <sysclk.h>
+#include <switch.h>
 
 #include "config.h"
 #include "board.h"
@@ -37,6 +55,7 @@ class ClockManager
     bool Running();
     void GetFreqList(SysClkModule module, std::uint32_t* list, std::uint32_t maxCount, std::uint32_t* outCount);
     void Tick();
+    void ResetToStockClocks();
     void WaitForNextTick();
     void SetRNXRTMode(ReverseNXMode mode);
     struct {
@@ -51,6 +70,7 @@ class ClockManager
     bool ConfigIntervalTimeout(SysClkConfigValue intervalMsConfigValue, std::uint64_t ns, std::uint64_t* lastLogNs);
     void RefreshFreqTableRow(SysClkModule module);
     bool RefreshContext();
+    void set_sd1_voltage(uint32_t voltage_uv);
 
     static ClockManager *instance;
 

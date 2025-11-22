@@ -13,10 +13,10 @@ extern "C" {
 #include <sys/syslimits.h>
 #include <switch.h>
 
-#define LOG_DIR "./config/hoc-clk/"
-#define LOG_FILE "./config/hoc-clk/fan_log.txt"
-#define CONFIG_DIR "./config/hoc-clk/"
-#define CONFIG_FILE "./config/hoc-clk/config.dat"
+#define LOG_DIR "./config/horizon-oc/"
+#define LOG_FILE "./config/horizon-oc/fan_log.txt"
+#define CONFIG_DIR "./config/horizon-oc/"
+#define CONFIG_FILE "./config/horizon-oc/config.dat"
 #define TABLE_SIZE sizeof(TemperaturePoint) * 10
 
 

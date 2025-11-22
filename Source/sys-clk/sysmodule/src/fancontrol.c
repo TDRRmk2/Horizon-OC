@@ -2,17 +2,17 @@
 #include "tmp451.h"
 
 //Fan curve table
-const TemperaturePoint defaultTable[] =
+TemperaturePoint defaultTable[] =
 {
-    { .temperature_c = 25.0, .fanLevel_f = 0.10 },
-    { .temperature_c = 30.0, .fanLevel_f = 0.20 },
-    { .temperature_c = 35.0, .fanLevel_f = 0.30 },
-    { .temperature_c = 40.0, .fanLevel_f = 0.40 },
-    { .temperature_c = 45.0, .fanLevel_f = 0.50 },
-    { .temperature_c = 50.0, .fanLevel_f = 0.60 },
-    { .temperature_c = 55.0, .fanLevel_f = 0.70 },
-    { .temperature_c = 60.0, .fanLevel_f = 0.80 },
-    { .temperature_c = 65.0, .fanLevel_f = 0.90 },
+    { .temperature_c = 25.0, .fanLevel_f = 0.00 },
+    { .temperature_c = 30.0, .fanLevel_f = 0.00 },
+    { .temperature_c = 35.0, .fanLevel_f = 0.00 },
+    { .temperature_c = 40.0, .fanLevel_f = 0.00 },
+    { .temperature_c = 45.0, .fanLevel_f = 0.30 },
+    { .temperature_c = 50.0, .fanLevel_f = 0.50 },
+    { .temperature_c = 55.0, .fanLevel_f = 0.60 },
+    { .temperature_c = 60.0, .fanLevel_f = 0.85 },
+    { .temperature_c = 65.0, .fanLevel_f = 0.95 },
     { .temperature_c = 70.0, .fanLevel_f = 1.00 }
 };
 
@@ -135,8 +135,8 @@ void FanControllerThreadFunction(void*)
     FanController fc;
     float fanLevelSet_f = 0;
     float temperatureC_f = 0;
-    u64 awakeSleepTime = 250000000ULL; // 0.25 second when awake (250ms - responsive)
-    u64 sleepSleepTime = 5000000000ULL; // 5 seconds when in sleep
+    u64 awakeSleepTime = 1000000000ULL; // 1 second when awake
+    u64 sleepSleepTime = 10000000000ULL; // 10 seconds when in sleep
     int sleepCheckCounter = 0;
 
     Result rs = fanOpenController(&fc, 0x3D000001);
@@ -148,9 +148,9 @@ void FanControllerThreadFunction(void*)
 
     while(!fanControllerThreadExit)
     {
-        // Check if system is awake every 20 iterations (~5 seconds) to reduce overhead
+        // Check if system is awake every 40 iterations (~10 seconds) to reduce overhead
         sleepCheckCounter++;
-        if(sleepCheckCounter >= 20)
+        if(sleepCheckCounter >= 40)
         {
             bool isAwake = IsSystemAwake();
             sleepCheckCounter = 0;

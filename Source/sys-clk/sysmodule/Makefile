@@ -17,7 +17,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 # INCLUDES is a list of directories containing header files
 # EXEFS_SRC is the optional input directory containing data copied into exefs, if anything this normally should only contain "main.npdm".
 #---------------------------------------------------------------------------------
-TARGET		:=	sys-clk
+TARGET		:=	horizon-oc
 BUILD		:=	build
 OUTDIR		:=	out
 RESOURCES	:=	res
@@ -39,7 +39,7 @@ DEFINES	:=	-DDISABLE_IPC -DTARGET="\"$(TARGET)\"" -DTARGET_VERSION="\"$(TARGET_V
 
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+CFLAGS	:=	-g -Wall -Os -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__

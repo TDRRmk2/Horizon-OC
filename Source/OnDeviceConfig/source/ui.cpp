@@ -111,8 +111,6 @@ void UI::renderGPUMenu() {
     
     auto& data = kipHandler->getData();
     std::vector<std::string> menuItems = {
-        "Enable Unsafe Frequencies (Mariko): " + std::string(data.enableMarikoGpuUnsafeFreqs ? "ON" : "OFF"),
-        "Enable Unsafe Frequencies (Erista): " + std::string(data.enableEristaGpuUnsafeFreqs ? "ON" : "OFF"),
         "Mariko GPU vMin: " + (data.marikoGpuVmin == 0 ? "Disabled" : std::to_string(data.marikoGpuVmin) + "mV"),
         "Mariko GPU vMax: " + (data.marikoGpuVmax == 0 ? "Disabled" : std::to_string(data.marikoGpuVmax) + "mV"),
         "Erista GPU vMin: " + (data.eristaGpuVmin == 0 ? "Disabled" : std::to_string(data.eristaGpuVmin) + "mV"),
@@ -144,8 +142,6 @@ void UI::renderCPUMenu() {
     
     auto& data = kipHandler->getData();
     std::vector<std::string> menuItems = {
-        "Enable Unsafe Frequencies (Mariko): " + std::string(data.enableMarikoCpuUnsafeFreqs ? "ON" : "OFF"),
-        "Enable Unsafe Frequencies (Erista): " + std::string(data.enableEristaCpuUnsafeFreqs ? "ON" : "OFF"),
         "CPU Boost Frequency: " + std::to_string(data.commonCpuBoostClock / 1000) + " MHz",
         "Mariko CPU vMin: " + (data.marikoCpuVmin == 0 ? "Default" : std::to_string(data.marikoCpuVmin) + "mV"),
         "Mariko CPU vMax: " + (data.marikoCpuMaxVolt == 0 ? "Disabled" : std::to_string(data.marikoCpuMaxVolt) + "mV"),
@@ -346,28 +342,6 @@ void UI::handleGPUMenuInput(u64 kDown) {
         auto& data = kipHandler->getData();
         
         switch (selectedIndex) {
-            case 0: { // Mariko GPU Unsafe Freqs
-                std::vector<std::string> opts = {"Disabled (0)", "Enabled (1)"};
-                showValueEditor("Enable Unsafe GPU Frequencies (Mariko)", EditorType::LIST,
-                    data.enableMarikoGpuUnsafeFreqs, 
-                    [this, &data](int val) {
-                        data.enableMarikoGpuUnsafeFreqs = val;
-                        if (autoSave && kipHandler) kipHandler->writeKip();
-                        setStatus("Mariko GPU unsafe: " + std::string(val ? "ENABLED" : "DISABLED"));
-                    }, opts);
-                break;
-            }
-            case 1: { // Erista GPU Unsafe Freqs
-                std::vector<std::string> opts = {"Disabled (0)", "Enabled (1)"};
-                showValueEditor("Enable Unsafe GPU Frequencies (Erista)", EditorType::LIST,
-                    data.enableEristaGpuUnsafeFreqs, 
-                    [this, &data](int val) {
-                        data.enableEristaGpuUnsafeFreqs = val;
-                        if (autoSave && kipHandler) kipHandler->writeKip();
-                        setStatus("Erista GPU unsafe: " + std::string(val ? "ENABLED" : "DISABLED"));
-                    }, opts);
-                break;
-            }
             case 5: { // Mariko GPU UV
                 std::vector<std::string> opts = {"UV0 (No Table)", "UV1 (Regular)", "UV2 (High)", "UV3 (Custom)"};
                 showValueEditor("Mariko GPU Undervolt Mode", EditorType::LIST,
@@ -418,28 +392,6 @@ void UI::handleCPUMenuInput(u64 kDown) {
         auto& data = kipHandler->getData();
         
         switch (selectedIndex) {
-            case 0: { // Mariko CPU Unsafe
-                std::vector<std::string> opts = {"Disabled (0)", "Enabled (1)"};
-                showValueEditor("Enable Unsafe CPU Frequencies (Mariko)", EditorType::LIST,
-                    data.enableMarikoCpuUnsafeFreqs, 
-                    [this, &data](int val) {
-                        data.enableMarikoCpuUnsafeFreqs = val;
-                        if (autoSave && kipHandler) kipHandler->writeKip();
-                        setStatus("Mariko CPU unsafe: " + std::string(val ? "ENABLED" : "DISABLED"));
-                    }, opts);
-                break;
-            }
-            case 1: { // Erista CPU Unsafe
-                std::vector<std::string> opts = {"Disabled (0)", "Enabled (1)"};
-                showValueEditor("Enable Unsafe CPU Frequencies (Erista)", EditorType::LIST,
-                    data.enableEristaCpuUnsafeFreqs, 
-                    [this, &data](int val) {
-                        data.enableEristaCpuUnsafeFreqs = val;
-                        if (autoSave && kipHandler) kipHandler->writeKip();
-                        setStatus("Erista CPU unsafe: " + std::string(val ? "ENABLED" : "DISABLED"));
-                    }, opts);
-                break;
-            }
             default:
                 setStatus("Feature in development");
                 break;

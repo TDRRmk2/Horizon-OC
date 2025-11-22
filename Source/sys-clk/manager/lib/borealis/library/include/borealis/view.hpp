@@ -213,7 +213,7 @@ class View
 
     /**
       * Called each frame
-      * Do not override it to draw your view,
+      * Default it to draw your view,
       * override draw() instead
       */
     virtual void frame(FrameContext* ctx);

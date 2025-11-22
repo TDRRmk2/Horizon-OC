@@ -94,14 +94,8 @@ void SafetyCheck() {
             R_SUCCEED();
         }
     };
-    u32 eristaCpuDvfsMaxFreq;
-    if (C.enableEristaCpuUnsafeFreqs) {
-        eristaCpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaCpuDvfsTableUnsafeFreqs)->freq);
-    } else {
-        eristaCpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaCpuDvfsTable)->freq);
-    }
+    u32 eristaCpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaCpuDvfsTable)->freq);
     u32 marikoCpuDvfsMaxFreq;
-    if(!C.enableMarikoCpuUnsafeFreqs) {
         if (C.marikoCpuUV) {
             marikoCpuDvfsMaxFreq = static_cast<u32>(
                 GetDvfsTableLastEntry(C.marikoCpuDvfsTableSLT)->freq
@@ -111,9 +105,6 @@ void SafetyCheck() {
                 GetDvfsTableLastEntry(C.marikoCpuDvfsTable)->freq
             );
         }
-    } else {
-        marikoCpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoCpuDvfsTableUnsafeFreqs)->freq);
-    }
     u32 eristaGpuDvfsMaxFreq;
     switch (C.eristaGpuUV)
     {
@@ -124,17 +115,8 @@ void SafetyCheck() {
         eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTableSLT)->freq);
         break;
     case 2:
-        eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTableHigh)->freq);
-        break;
     case 3:
-        if(C.enableEristaGpuUnsafeFreqs)
-        {
-            eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTableUv3UnsafeFreqs)->freq);
-        }
-        else
-        {
-            eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTable)->freq);
-        }
+        eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTableHigh)->freq);
         break;
     default:
         eristaGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.eristaGpuDvfsTable)->freq);
@@ -150,17 +132,8 @@ void SafetyCheck() {
             marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTableSLT)->freq);
             break;
         case 2:
-            marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTableHiOPT)->freq);
-            break;
         case 3:
-            if(C.enableMarikoGpuUnsafeFreqs)
-            {
-                marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTableUv3UnsafeFreqs)->freq);
-            }
-            else
-            {
-                marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTable)->freq);
-            }
+            marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTableHiOPT)->freq);
             break;
         default:
             marikoGpuDvfsMaxFreq = static_cast<u32>(GetDvfsTableLastEntry(C.marikoGpuDvfsTable)->freq);

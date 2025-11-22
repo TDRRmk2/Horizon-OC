@@ -60,10 +60,6 @@ bool KipHandler::readKip() {
     data.marikoGpuUV = readU32();
     data.eristaCpuUV = readU32();
     data.eristaGpuUV = readU32();
-    data.enableMarikoGpuUnsafeFreqs = readU32();
-    data.enableEristaGpuUnsafeFreqs = readU32();
-    data.enableMarikoCpuUnsafeFreqs = readU32();
-    data.enableEristaCpuUnsafeFreqs = readU32();
     data.commonGpuVoltOffset = readU32();
     data.marikoEmcDvbShift = readU32();
     
@@ -179,10 +175,6 @@ bool KipHandler::writeKip() {
     writeU32(data.marikoGpuUV);
     writeU32(data.eristaCpuUV);
     writeU32(data.eristaGpuUV);
-    writeU32(data.enableMarikoGpuUnsafeFreqs);
-    writeU32(data.enableEristaGpuUnsafeFreqs);
-    writeU32(data.enableMarikoCpuUnsafeFreqs);
-    writeU32(data.enableEristaCpuUnsafeFreqs);
     writeU32(data.commonGpuVoltOffset);
     writeU32(data.marikoEmcDvbShift);
     
