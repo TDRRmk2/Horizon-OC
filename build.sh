@@ -9,7 +9,7 @@ cp -r "$SRC"/. "$DEST"/
 
 cd build/stratosphere/loader || exit 1
 make -j"$(nproc)"
-hactool -t kip1 out/nintendo_nx_arm64_armv8a/release/loader.kip --uncompress=hoc.kip
+"$DEVKITPRO"/tools/bin/hactool -t kip1 out/nintendo_nx_arm64_armv8a/release/loader.kip --uncompress=hoc.kip
 cd ../../../ # exit
 cp build/stratosphere/loader/hoc.kip dist/atmosphere/kips/hoc.kip
 
