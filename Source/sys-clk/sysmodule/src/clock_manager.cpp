@@ -244,11 +244,10 @@ void ClockManager::Tick()
 
         #define DEFAULT_FREQ_MHZ 1600
         #define DEFAULT_FREQ_MHZ_M 1862
-
         int ram_mhz = Board::GetHz((SysClkModule)SysClkModule_MEM) / 1000000;
 
         if (Board::GetSocType() == SysClkSocType_Mariko) {
-            if(ram_mhz > DEFAULT_FREQ_MHZ_M)
+            if(ram_mhz > DEFAULT_FREQ_MHZ)
                 set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUV));
             else
                 set_sd1_voltage(this->config->GetConfigValue(HocClkConfigValue_EMCVdd2VoltageUVStockMariko));
