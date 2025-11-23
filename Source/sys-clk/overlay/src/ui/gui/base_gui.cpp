@@ -32,10 +32,6 @@
 #include <tesla.hpp>
 #include <math.h>
 
-// -------------------------------------------------------------
-// Layout constants
-// -------------------------------------------------------------
-
 #define LOGO_X 20
 #define LOGO_Y 50
 #define LOGO_LABEL_FONT_SIZE 45
@@ -43,10 +39,6 @@
 #define VERSION_X (LOGO_X + 250)
 #define VERSION_Y (LOGO_Y - 40)
 #define VERSION_FONT_SIZE 15
-
-// -------------------------------------------------------------
-// Version string getter
-// -------------------------------------------------------------
 
 std::string getVersionString() {
     char buf[0x100] = "";
@@ -57,18 +49,12 @@ std::string getVersionString() {
     return std::string(buf);
 }
 
-// -------------------------------------------------------------
-// Animated Ultra Text
-// -------------------------------------------------------------
 
-// Your animated wave colors (example placeholders)
-static constexpr tsl::Color dynamicLogoRGB1 = tsl::Color(40, 255, 80, 255);
-static constexpr tsl::Color dynamicLogoRGB2 = tsl::Color(120, 255, 160, 255);
+static constexpr tsl::Color dynamicLogoRGB1 = tsl::Color(83, 216, 239, 255);
+static constexpr tsl::Color dynamicLogoRGB2 = tsl::Color(126, 174, 247, 255);
 
-// Your project name rendered letter-by-letter
-static constexpr const char* PROJECT_NAME = "Horizon OC Gaea";
+static constexpr const char* PROJECT_NAME = "Horizon OC Zeus";
 
-// Fully corrected function signature
 static s32 drawDynamicUltraText(
     tsl::gfx::Renderer* renderer,
     s32 startX,
@@ -86,22 +72,18 @@ static s32 drawDynamicUltraText(
     const double timeNow = static_cast<double>(currentTime_ns) / 1e9;
     const double timeBase = fmod(timeNow, cycleDuration);
 
-    // Controls wave spacing
     const double waveScale = 2.0 * M_PI / cycleDuration;
 
-    // Every character has its own index offset
     for (size_t i = 0; i < name.size(); i++)
     {
         char letter = name[i];
         if (letter == '\0') break;
 
-        // phase shift per character → THIS CREATES THE WAVE
         double phase = waveScale * (timeBase + i * 0.12);
 
         double raw = cos(phase);
         double n = (raw + 1.0) * 0.5;
 
-        // Smoothstep ×2 (ultra smooth)
         double s1 = n * n * (3.0 - 2.0 * n);
         double s2 = s1 * s1 * (3.0 - 2.0 * s1);
 
@@ -125,10 +107,6 @@ static s32 drawDynamicUltraText(
     return currentX;
 }
 
-
-// -------------------------------------------------------------
-// Rendering functions
-// -------------------------------------------------------------
 
 void BaseGui::preDraw(tsl::gfx::Renderer* renderer)
 {

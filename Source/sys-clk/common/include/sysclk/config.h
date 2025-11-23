@@ -164,7 +164,7 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
         case HocClkConfigValue_EristaCpuBoostClock:
             return 1785ULL;
         case HocClkConfigValue_EristaMaxGpuClock:
-            return 921ULL;
+            return 844ULL;
         case HocClkConfigValue_EristaMaxMemClock:
             return 1600ULL;
 
@@ -172,7 +172,7 @@ static inline uint64_t sysclkDefaultConfigValue(SysClkConfigValue val)
         case HocClkConfigValue_MarikoCpuBoostClock:
             return 1963ULL;
         case HocClkConfigValue_MarikoMaxGpuClock:
-            return 1152ULL;
+            return 998ULL;
         case HocClkConfigValue_MarikoMaxMemClock:
             return 1862ULL;
 
