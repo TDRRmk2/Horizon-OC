@@ -487,6 +487,11 @@ bool ClockManager::RefreshContext()
         this->context->partLoad[loadSource] = Board::GetPartLoad((SysClkPartLoad)loadSource);
     }
 
+    for (unsigned int voltageSource = 0; voltageSource < HocClkVoltage_EnumMax; voltageSource++)
+    {
+        this->context->voltages[voltageSource] = Board::GetVoltage((HocClkVoltage)voltageSource);
+    }
+
     if (this->ConfigIntervalTimeout(SysClkConfigValue_CsvWriteIntervalMs, ns, &this->lastCsvWriteNs))
     {
         FileUtils::WriteContextToCsv(this->context);
@@ -531,7 +536,7 @@ void ClockManager::set_sd1_voltage(uint32_t voltage_uv)
 
 	res = i2csessionReceiveAuto(&session, &current_val, 1, I2cTransactionOption_Stop);
 	if (R_FAILED(res)) {
-        writeNotification("I2C write failed. This may be a hardware issue");
+        writeNotification("I2C read failed. This may be a hardware issue");
 		i2csessionClose(&session);
 		return;
 	}
@@ -542,6 +547,10 @@ void ClockManager::set_sd1_voltage(uint32_t voltage_uv)
 	// Write back register with START and STOP conditions
 	u8 write_buf[2] = {volt_addr, new_val};
 	res = i2csessionSendAuto(&session, write_buf, sizeof(write_buf), I2cTransactionOption_All);
-
+	if (R_FAILED(res)) {
+        writeNotification("I2C write failed. This may be a hardware issue");
+		i2csessionClose(&session);
+		return;
+	}
 	i2csessionClose(&session);
 }

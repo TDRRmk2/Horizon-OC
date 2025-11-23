@@ -88,6 +88,15 @@ typedef enum
     ReverseNX_Docked,
 } ReverseNXMode;
 
+typedef enum {
+    HocClkVoltage_CPU = 0,
+    HocClkVoltage_GPU,
+    HocClkVoltage_EMCVDD2,
+    HocClkVoltage_EMCVDDQ_MarikoOnly,
+    HocClkVoltage_Display,
+    HocClkVoltage_SOC,
+    HocClkVoltage_EnumMax,
+} HocClkVoltage;
 
 #define SYSCLK_ENUM_VALID(n, v) ((v) < n##_EnumMax)
 
@@ -148,6 +157,27 @@ static inline const char* sysclkFormatProfile(SysClkProfile profile, bool pretty
             return pretty ? "USB Charger" : "handheld_charging_usb";
         case SysClkProfile_HandheldChargingOfficial:
             return pretty ? "PD Charger" : "handheld_charging_official";
+        default:
+            return NULL;
+    }
+}
+
+static inline const char* hocClkFormatVoltage(HocClkVoltage voltage, bool pretty)
+{
+    switch(voltage)
+    {
+        case HocClkVoltage_CPU:
+            return pretty ? "CPU" : "cpu";
+        case HocClkVoltage_GPU:
+            return pretty ? "GPU" : "gpu";
+        case HocClkVoltage_EMCVDD2:
+            return pretty ? "VDD2" : "emcvdd2";
+        case HocClkVoltage_EMCVDDQ_MarikoOnly:
+            return pretty ? "VDDQ" : "vddq";
+        case HocClkVoltage_SOC:
+            return pretty ? "SOC" : "soc";
+        case HocClkVoltage_Display:
+            return pretty ? "SOC" : "soc";
         default:
             return NULL;
     }

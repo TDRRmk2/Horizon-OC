@@ -52,6 +52,7 @@ class Board
     static std::uint32_t GetTemperatureMilli(SysClkThermalSensor sensor);
     static std::int32_t GetPowerMw(SysClkPowerSensor sensor);
     static std::uint32_t GetPartLoad(SysClkPartLoad load);
+    static std::uint32_t GetVoltage(HocClkVoltage voltage);
     static SysClkSocType GetSocType();
 
   protected:

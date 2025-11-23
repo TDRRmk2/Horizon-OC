@@ -41,6 +41,7 @@ typedef struct
     uint32_t temps[SysClkThermalSensor_EnumMax];
     int32_t power[SysClkPowerSensor_EnumMax];
     uint32_t partLoad[SysClkPartLoad_EnumMax];
+    uint32_t voltages[HocClkVoltage_EnumMax];
 //  uint32_t perfConfId;
 } SysClkContext;
 
