@@ -37,25 +37,26 @@ namespace ams::ldr::oc::pcv::mariko {
         R_SUCCEED();
     }
 
-    Result CpuFreqVdd(u32 *ptr) {
-        dvfs_rail *entry = reinterpret_cast<dvfs_rail *>(reinterpret_cast<u8 *>(ptr) - offsetof(dvfs_rail, freq));
+    Result CpuFreqVdd(u32* ptr) {
+        dvfs_rail* entry = reinterpret_cast<dvfs_rail *>(reinterpret_cast<u8 *>(ptr) - offsetof(dvfs_rail, freq));
 
-        R_UNLESS(entry->id == 1, ldr::ResultInvalidCpuFreqVddEntry());
-        R_UNLESS(entry->min_mv == 250'000, ldr::ResultInvalidCpuFreqVddEntry());
-        R_UNLESS(entry->step_mv == 5000, ldr::ResultInvalidCpuFreqVddEntry());
+        R_UNLESS(entry->id == 1,            ldr::ResultInvalidCpuFreqVddEntry());
+        R_UNLESS(entry->min_mv == 250'000,  ldr::ResultInvalidCpuFreqVddEntry());
+        R_UNLESS(entry->step_mv == 5000,    ldr::ResultInvalidCpuFreqVddEntry());
         R_UNLESS(entry->max_mv == 1525'000, ldr::ResultInvalidCpuFreqVddEntry());
-        if (C.marikoCpuUV)
-        {
+
+        if (C.marikoCpuUV) {
             PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.marikoCpuDvfsTableSLT)->freq);
         } else {
             PATCH_OFFSET(ptr, GetDvfsTableLastEntry(C.marikoCpuDvfsTable)->freq);
         }
+
         R_SUCCEED();
     }
 
-    Result CpuVoltRange(u32 *ptr) {
+    Result CpuVoltRange(u32* ptr) {
         u32 min_volt_got = *(ptr - 1);
-        for (const auto &mv : CpuMinVolts) {
+        for (const auto& mv : CpuMinVolts) {
             if (min_volt_got != mv)
                 continue;
 
@@ -65,79 +66,38 @@ namespace ams::ldr::oc::pcv::mariko {
             PATCH_OFFSET(ptr, C.marikoCpuMaxVolt);
             // Patch vmin for slt
             if (C.marikoCpuUV) {
-                if (*(ptr - 5) == 620) {
-                    PATCH_OFFSET((ptr - 5), C.marikoCpuHighVmin); // hf vmin
+                if (*(ptr-5) == 620) {
+                    PATCH_OFFSET((ptr-5), 600);
                 }
-                if (*(ptr - 1) == 620) {
-                    PATCH_OFFSET((ptr - 1), C.marikoCpuLowVmin); // lf vmin
+                if (*(ptr-1) == 620) {
+                    PATCH_OFFSET((ptr-1), 600);
                 }
+
             }
             R_SUCCEED();
         }
         R_THROW(ldr::ResultInvalidCpuMinVolt());
     }
 
-    Result CpuVoltDfll(u32 *ptr) {
+    Result CpuVoltDfll(u32* ptr) {
         cvb_cpu_dfll_data *entry = reinterpret_cast<cvb_cpu_dfll_data *>(ptr);
 
-        R_UNLESS(entry->tune0_low == 0x0000FFCF, ldr::ResultInvalidCpuVoltDfllEntry());
-        R_UNLESS(entry->tune0_high == 0x00000000, ldr::ResultInvalidCpuVoltDfllEntry());
-        R_UNLESS(entry->tune1_low == 0x012207FF, ldr::ResultInvalidCpuVoltDfllEntry());
-        R_UNLESS(entry->tune1_high == 0x03FFF7FF, ldr::ResultInvalidCpuVoltDfllEntry());
-        switch (C.marikoCpuUV) {
-        case 0:
-            break;
-        case 1:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FF90); // process_id 0 // EOS UV1
+        R_UNLESS(entry->tune0_low == 0x0000FFCF,   ldr::ResultInvalidCpuVoltDfllEntry());
+        R_UNLESS(entry->tune0_high == 0x00000000,    ldr::ResultInvalidCpuVoltDfllEntry());
+        R_UNLESS(entry->tune1_low == 0x012207FF,   ldr::ResultInvalidCpuVoltDfllEntry());
+        R_UNLESS(entry->tune1_high == 0x03FFF7FF,    ldr::ResultInvalidCpuVoltDfllEntry());
+
+        if (C.marikoCpuUV) {
+            if (C.marikoCpuUV == 1) {
+                PATCH_OFFSET(&(entry->tune0_low), 0x0000FF90); //process_id 0
+            } else if (C.marikoCpuUV == 2) {
+                PATCH_OFFSET(&(entry->tune0_low), 0x0000FFA0); //process_id 1
+            }
             PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
             PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
             PATCH_OFFSET(&(entry->tune1_high), 0x00000000);
-            break;
-        case 2:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FF92); /// EOS Uv2
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x00000000);
-            break;
-        case 3:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FF9A); // EOS UV3
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x00000000);
-            break;
-        case 4:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FFA2); // EOS Uv4
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x00000000);
-            break;
-        case 5:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FFFF); // EOS UV5
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x022217FF);
-            break;
-        case 6:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FFFF); // EOS UV6
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x024417FF);
-            break;
-        case 7:
-            PATCH_OFFSET(&(entry->tune0_low), 0x0000FFFF); // EOS UV6
-            PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-            PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-            PATCH_OFFSET(&(entry->tune1_high), 0x026617FF);
-            break;
-        // case 8:
-        //     PATCH_OFFSET(&(entry->tune0_low), 0x0000FFFF); // EOS UV6
-        //     PATCH_OFFSET(&(entry->tune0_high), 0x0000FFFF);
-        //     PATCH_OFFSET(&(entry->tune1_low), 0x021107FF);
-        //     PATCH_OFFSET(&(entry->tune1_high), 0x028817FF);
-        //     break;
-        default:
-            break;
         }
+
         R_SUCCEED();
     }
 
